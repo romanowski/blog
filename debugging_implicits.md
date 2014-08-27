@@ -1,19 +1,19 @@
 Debugging implicits
 ======
 
-I was recently asked what are my favorite and least favorite Scala features. Probably few options would be matching here, but I decided to give one answer for both questions: implicits. Why? Implicits are very simple and yet very powerful concept but with great power comes great responsibility. They can be used for implicit parameters, implicit conversions, view bonds and context bounds (type classes) letting us solve few different problems with one language feature. But at the same time we must be aware in what context we are using them and - which is much harder - which implicits are available in the current context.
+I was recently asked what are my favorite and least favorite Scala features. Probably few options would be matching here, but I decided to give one answer for both questions: implicits. Why? Implicits are very simple and yet very powerful concept but with great power comes great responsibility. They can be used for implicit parameters, implicit conversions, view bonds and context bounds (type classes) letting us solve couple of different problems with one language feature. But at the same time we must be aware in what context we are using them and - which is much harder - which implicits are available in the current context.
 
 Luckily we are not left alone with that problem. Main Scala IDEs like [ScalaIDE](http://scala-ide.org/docs/current-user-doc/features/typingviewing/implicit-highlighting/index.html) or [IntelliJ](http://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Implicit+Conversions) are able to list currently used implicits and we can do the same in REPL as well.
 
 Let's go through basic example with Ordering type class to check how things works together and what to do in case you are stuck. First, let's create simple class wrapper around Int value and make array of its elements:
 
 ```scala
-case class IntWrapper(n:Int)
+case class IntWrapper(n: Int)
 
 val list = Array(IntWrapper(2), IntWrapper(7), IntWrapper(3))
 ```
 
-Now we want to sort our list using one of the methods from the standard library. We can do this using _sortBy_, _sortWith_, or _sorted_. We want to use _sorted_:
+Now we want to sort our list using one of the methods from the standard library. We can do this using _sortBy_, _sortWith_, or _sorted_. We will use _sorted_:
 
 ```scala
 scala> list.sorted
@@ -43,7 +43,7 @@ scala> list.sorted
 res0: Array[IntWrapper] = Array(IntWrapper(2), IntWrapper(3), IntWrapper(7))
 ```
 
-There is nothing difficult here. Type of implicit value required and provided are exactly the same. Now let's try how it works with inheritance version. To make things a bit more difficult we choose to extend our class with _Ordered[IntWrapper]_ rather than _Ordering[IntWrapper]_:
+There is nothing difficult here. Required and provided implicit values have exactly the same type. Now let's try how it works with inheritance version. To make things a bit more difficult we choose to extend our class with _Ordered[IntWrapper]_ rather than _Ordering[IntWrapper]_:
 
 ```scala
 case class IntWrapper(n:Int) extends Ordered[IntWrapper] {
@@ -51,7 +51,8 @@ case class IntWrapper(n:Int) extends Ordered[IntWrapper] {
 }
 ```
 
-And everything works again. But it raises one interesting question: how? Our method _sorted_ requires one implicit parameter of type _Ordering[IntWrapper]_. We provided none, and we doesn't even have class _Ordering_ anywhere. It would be reasonable to guess that some implicit conversions or implicits chaining happens behind the scene. Possibly one word of explanation what I understand by the term 'implicits chaining' is required. Martin Odersky in his book _"Programming in Scala"_ says:
+And everything works again. But it raises one interesting question: how? Our method _sorted_ requires one implicit parameter of type _Ordering[IntWrapper]_. We provided none, and we doesn't even mentioned class _Ordering_ anywhere. It would be reasonable to guess that some implicit conversions or implicits chaining happens behind the scene. Possibly one word of explanation what I understand by the term 'implicits chaining' is required. Martin Odersky in his book "Programming in Scala" says:
+
 _"One-at-a-time Rule: Only one implicit is tried. The compiler will never rewrite x + y to convert1(convert2(x)) + y. Doing so would cause compile times to increase dramatically on erroneous code, and it would increase the difference between what the programmer writes and what the program actually does. For sanity’s sake, the compiler does not insert further implicit conversions when it is already in the middle of trying another implicit. **However, it’s possible to circumvent this restriction by having implicits take implicit parameters, which will be described later in this chapter.**"_
 
 Bold emphasis is mine. We will see example of behavior described by Odersky in a moment but first we need to introduce some methods to check what really happens under the hood. Except IDEs support mentioned at the beggining of this article we have at least few other options.
@@ -120,7 +121,7 @@ Additional downside of this method is that it will produce that kind of noisy ou
 
 REPL command _:javap_
 ------
-_:javap_ command gives us possibility to print various details of bytecode generated by Scala compiler. Let's try to use it to check what happens inside _sorted_:
+_:javap_ command gives us possibility to print various details of the bytecode generated by Scala compiler. Let's try to use it to check what happens inside _sorted_:
 
 ```scala
 scala> def sortedList = list.sorted
@@ -297,7 +298,7 @@ If you have problem with finding exact information about implicits, here it is:
 24: invokevirtual #46                 // Method scala/math/Ordering$.ordered:(Lscala/Function1;)Lscala/math/Ordering;
 ```
 
-We will analyze that in a moment, but first let's look at out third - and most effective - debugging method.
+We will analyze that in a moment, but first let's look at our third - and most effective - debugging method.
 
 Scala reflection API
 ------
@@ -318,7 +319,7 @@ res0: String = Predef.refArrayOps($read.list).sorted(Ordering.ordered(Predef.$co
 ```
 Woha! That is exactly what we need without any bloat or syntactic noise. We can clearly see that what happened and in what order.
 
-First _Predef.refArrayOps_ implicit conversion is applied to convert _Array_ to _ArrayOps_ (which contain method _sorted_). Since _sorted_ requires _Ordering[IntWrapper]_ as implicit parameter _Ordering.ordered_ implicit conversion is applied:
+First _Predef.refArrayOps_ implicit conversion is applied to convert _Array_ to _ArrayOps_ (which contains method _sorted_). Since _sorted_ requires _Ordering[IntWrapper]_ as implicit parameter _Ordering.ordered_ implicit conversion is applied:
 
 ```scala
 implicit def ordered[A](implicit arg0: (A) ⇒ Comparable[A]): Ordering[A]
@@ -348,9 +349,9 @@ implicit def ordered[A <% Comparable[A]]: Ordering[A] = new Ordering[A] {
 
 Conclusion
 ------
-As we seen mix of implicit conversions and implicits chaining could become hard to figure out without reaching help from IDE or compiler. Does it mean that implicits are inherently bad idea?
-Not necessarily. Do we normally care what happens under the hood when we are using Ordering or other type classes? Or any other implicit conversions or views for that matter? Usually not. Implicits allow us significantly reduce boiler plate code which would normally only obscure our view.
-I guess it's matter of taste. Some people prefer to have all that boilerplate generated, and then possibly hided by IDE. Others prefer to have it generated by compiler which is IDE-agnostic, but at first glance could be a bit harder to grasp and could look too 'magically'.
-Both approaches guarantees full control over the code, because we can always pass implicits explicitly or apply conversion by hand. We just don't do that, because usually it's so much easier to let the compiler do the dirty work.
-Yes, in cases you are lost you need to know your tools.
+As we seen mix of implicit conversions and implicits chaining could become hard to figure out without reaching help from IDE or compiler. Does it mean that implicits are inherently bad idea?  
+Not necessarily. Do we normally care what happens under the hood when we are using Ordering or other type classes? Or any other implicit conversions or views for that matter? Usually not. Implicits allow us significantly reduce boilerplate code which would normally only obscure our view.  
+I guess it's matter of taste. Some people prefer to have all that boilerplate generated, and then possibly hided by IDE. Others prefer to have it generated by compiler which is IDE-agnostic, but that at first glance could be a bit harder to grasp and could look too 'magically'.  
+Both approaches guarantees full control over the code, because we can always pass implicits explicitly or apply conversions by hand. We just don't do that, because usually it's so much easier to let the compiler do the dirty work.  
+Yes, in cases you are lost and really need to debug implicits you need to know your tools.  
 But is that really a bad thing?
