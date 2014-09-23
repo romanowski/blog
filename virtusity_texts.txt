@@ -1,7 +1,7 @@
 ﻿
 Fast Track to Scala
 
-Przedstawiamy dwudniowe warsztaty zaprojektowane dla programistów. Ich celem jest dostarczenie wiedzy niezbędnej do rozpoczęcia programowania w Scali. Jeśli masz już doświadczenie w innych językach programowania takich jak Java, C++, C# czy Ruby i chciałbyś zdobyć wiedzę na temat tego obiektowo-funkcyjnego języka pod okiem doświadczonych trenerów, to ten kurs jest dla Ciebie.
+Przedstawiamy dwudniowe warsztaty stworzone specjalnie by dostarczyć programistom wiedzy niezbędnej do rozpoczęcia programowania w Scali. Jeśli masz już doświadczenie w innych językach programowania takich jak Java, C++, C# czy Ruby i chciałbyś zdobyć wiedzę na temat tego obiektowo-funkcyjnego języka pod okiem doświadczonych trenerów, to ten kurs jest dla Ciebie.
 
 Trener
 
@@ -9,41 +9,42 @@ Trener zostanie wybrany z zespołu szkoleniowego VirtusLab bądź Typesafe, kied
 
 Opis
 
-Przebieg tego dwudniowego kursu bazuje na stopniowym rozwiązywaniu praktycznych problemów, co zapewni dobre zrozumienie podstaw Scali, przegląd dostępnych narzędzi oraz całego procesu tworzenia oprogramowania. Dodatkowo program zajęć pozwoli docenić użyteczność bardziej zaawansowanych funkcji tego obiektowo-funkcyjnego języka.
+Przebieg tego dwudniowego kursu bazuje na stopniowym rozwiązywaniu praktycznych problemów, co zapewnia dobre zrozumienie podstaw Scali, przegląd dostępnych narzędzi oraz całego procesu tworzenia oprogramowania. Dodatkowo program zajęć pozwola docenić użyteczność bardziej zaawansowanych funkcji tego obiektowo-funkcyjnego języka.
 
-Program nie zakłada wcześniejszej znajomości Scali, ale jeśli posiadasz już doświadczenie w programowaniu w tym języku, to kurs ten może być dobrą okazją do odświeżenia wiedzy i zdobycia certyfikatu. Szkolenie jest oficjalnie akredytowane przez Typesafe Inc.
+Kurs nie zakłada wcześniejszej znajomości Scali, ale jeśli posiadasz już doświadczenie w programowaniu w tym języku, to może być dobrą okazją do odświeżenia wiedzy i zdobycia certyfikatu. Szkolenie jest oficjalnie akredytowane przez Typesafe Inc.
 
 Wymagania wstępne:
 
-    znajomość innego języka programowania takiego jak Java, C#, C++ czy Ruby
-    podczas kursu potrzebny będzie własny laptop z zainstalowaną Javą 6 lub nowszą
+    znajomość innego języka programowania takiego jak Java, C#, C++ czy Ruby.
 
-Uczestnictwo w szkoleniu zapewnia:
+Podczas kursu potrzebny będzie własny laptop/komputer z zainstalowaną Javą 6 lub nowszą.
 
-    efektywne programowanie w Scali
-    znajomość i umiejętność programowania funkcyjnego w Scali
-    umiejętność posługiwania się podstawowymi narzędziami dostępnymi w ekosystemie Scali
-    pewność używania Scali w komercyjnych projektach
-    certyfikat potwierdzający ukończenie kursu
+Uczestnicy szkolenia uczą się:
 
-Program:
+    jak efektywnie programować w Scali,
+    jak wykorzystywać funkcyjne aspekty Scali,
+    jak korzystać z podstawowych narzędzi dostępnych w ekosystemie Scali,
+    pewności w używaniu Scali w komercyjnych projektach,
+    oraz otrzymują certyfikat potwierdzający ukończenie kursu.
 
-    wstęp
-    podstawy Scali
-    przegląd OOP
-    testowanie aplikacji
-    kolekcje i programowanie funkcyjne
-    for-expressions i pętle
-    traits oraz dziedziczenie
-    pattern matching
-    używanie wartości opcjonalnych
+Program szkolenia:
+
+    wstęp,
+    podstawy Scali,
+    przegląd OOP,
+    testowanie aplikacji,
+    kolekcje i programowanie funkcyjne,
+    for-expressions i pętle,
+    traits oraz dziedziczenie,
+    pattern matching,
+    używanie wartości opcjonalnych.
 
 Kurs jest zgodny z kursem Typesafe:  http://typesafe.com/how/training/fasttracktoscala
 
 ------------------------------------------
 Advanced Scala
 
-Warsztaty Advanced Scala służą poznaniu zaawansowanych funkcjonalności języka. Jeśli posiadasz już podstawowe doświadczenie w programowaniu w Scali, kurs ten pozwoli na pogłębienie wiedzy z programowania obiektowo-funkcyjnego oraz poznanie sposobów tworzenia DSL-i czy wykorzystania możliwości systemu typów języka.
+Warsztaty Advanced Scala służą poznaniu zaawansowanych funkcji języka. Jeśli posiadasz już podstawowe doświadczenie w programowaniu w Scali, kurs ten pozwoli na pogłębienie wiedzy z zakresu programowania obiektowo-funkcyjnego oraz poznanie sposobów tworzenia DSL-i czy wykorzystania możliwości systemu typów języka.
 
 Trener
 
@@ -51,32 +52,33 @@ Trener zostanie wybrany z zespołu szkoleniowego VirtusLab bądź Typesafe, kied
 
 Opis
 
-Szkolenie zostało zaprojektowane tak, aby pomóc programistom w pełni zrozumieć tematy związane z zaawansowanym programowaniem obiektowo-funkcyjnym, możliwościami systemu typów w Scali, implicitami czy kolekcjami.
-Podczas zajęć zaprezentowane zostaną techniki wykorzystania funkcjonalności języka do tworzenia dobrze zaprojektowanych bibliotek czy DSL-i. Wszystko w ramach tworzenia rozwiązania dla praktycznego przypadku użycia.
+Szkolenie zostało stworzone aby pomóc programistom w pełni zrozumieć tematy związane z zaawansowanym programowaniem obiektowo-funkcyjnym, możliwościami systemu typów w Scali, implicitami i kolekcjami.
+Podczas zajęć zaprezentowane zostaną techniki wykorzystania języka do tworzenia dobrze zaprojektowanych bibliotek czy DSLi. Wszystkie ćwiczenia oparte są na rozwiązywaniu konkretnego problemu.
 
 Szkolenie jest oficjalnie akredytowane przez Typesafe Inc. oraz umożliwia uzyskanie certyfikatu.
 
 Wymagania wstępne:
 
     podstawowa znajomość Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”)
-    co najmniej dwumiesięczne doświadczenie w programowaniu w Scali
-    uczestnicy powinni przynieść własny laptop z zainstalowaną Javą 6 lub nowszą
+    i co najmniej dwumiesięczne doświadczenie w programowaniu w Scali.
 
-Uczestnictwo w szkoleniu zapewnia:
+Uczestnicy powinni przynieść własny komputer/laptop z zainstalowaną Javą 6 lub nowszą.
 
-    zrozumienie zaawansowanych aspektów programowania obiektowo-funkcyjnego
-    znajomość i umiejętność stosowania w praktyce systemu typów Scali
-    zrozumienie implicitów oraz type class
-    umiejętność projektowania i tworzenia bibliotek oraz DSL-i w Scali
+Po ukończeniu tego kursu:
 
-Program:
+    zrozumiesz zaawansowane aspektów programowania obiektowo-funkcyjnego w Scali,
+    poznasz i nauczysz się stosować w praktyce systemu typów Scali,
+    zrozumiesz implicity oraz wzorzec 'type class'
+    oraz nauczysz się projektować i tworzenia bibliotek oraz DSLi w Scali.
 
-    przypomnienie podstaw Scali
-    zaawansowane elementy podejścia obiektowo-funkcyjnego
-    pogłębienie wiedzy na temat systemu typów w Scali
-    explicitly implicit
-    tworzenie wewnętrznych DSL-i
-    custom Scala collections
+Program szkolenia:
+
+    przypomnienie podstaw Scali,
+    zaawansowane elementy podejścia obiektowo-funkcyjnego,
+    pogłębienie wiedzy na temat systemu typów w Scali,
+    explicitly implicit,
+    tworzenie wewnętrznych DSLi,
+    implementacja własnych kolekcji w Scali.
 
 Kurs jest zgodny z kursem Typesafe:  http://typesafe.com/how/training/advancedscala
 
@@ -97,28 +99,29 @@ Szkolenie jest oficjalnie akredytowane przez Typesafe Inc. oraz umożliwia uzysk
 
 Wymagania wstępne:
 
-    podstawowa znajomość Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”)
-    uczestnicy kursu powinni przynieść własny laptop z zainstalowaną Javą 6 lub nowszą
+    podstawowa znajomość Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”).
+
+Uczestnicy kursu powinni przynieść własny komputer/laptop z zainstalowaną Javą 6 lub nowszą.
 
 Uczestnictwo w szkoleniu zapewnia:
 
-    wiedzę jak zaprojektować skalowalne i odporne na błędy aplikacje w Akce
-    umiejętność konfiguracji i testowania aplikacji w Akce
+    wiedzę jak zaprojektować skalowalne i odporne na błędy aplikacje w Akce,
+    umiejętność konfiguracji i testowania aplikacji w Akce,
     znajomość najlepszych praktyk z zakresu projektowania systemów asynchronicznych opartych na zdarzeniach (event-driven) używając Akki
-    pewność wykorzystania Akki na produkcji
+    oraz pewność wykorzystania Akki na produkcji.
 
-Program:
+Program szkolenia:
 
-    wstęp
-    podstawy modelu aktora
-    testowanie aktorów
-    cykl życia aktorów
-    odporność na błędy i awarie
-    routers, dispatchers
-    zmiana zachowania aktorów w czasie
-    wzorzec Ask
-    FSM
-    Akka Extensions
+    wstęp,
+    podstawy modelu aktora,
+    testowanie aktorów,
+    cykl życia aktorów,
+    odporność na błędy i awarie,
+    routers, dispatchers,
+    zmiana zachowania aktorów w czasie,
+    wzorzec Ask,
+    FSM,
+    Akka Extensions.
 
 Kurs jest zgodny z kursem Typesafe: http://typesafe.com/how/training/fasttracktoakkawithscala
 
@@ -140,27 +143,28 @@ Szkolenie jest oficjalnie akredytowane przez Typesafe Inc. oraz umożliwia uzysk
 
 Wymagania wstępne:
 
-    znajomość Akki (zgodnie z zakresem szkolenia “Fast Track to Akka with Scala”)
-    co najmniej dwa miesiące praktycznego doświadczenia w Akce oraz Scali - w tym wiedza odnośnie przesyłania wiadomości, różnicy między przetwarzaniem asynchronicznym i nieblokującym, a także między współbieżnością i przetwarzaniem równoległym, zasady działania supervisorów, zmiany zachowania przez become, routers i dispatchers
-    podstawowa znajomość Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”)
-    uczestnicy kursu powinni przynieść własny laptop z zainstalowaną Javą 6 lub nowszą
+    znajomość Akki (zgodnie z zakresem szkolenia “Fast Track to Akka with Scala”),
+    co najmniej dwa miesiące praktycznego doświadczenia w Akce oraz Scali - w tym wiedza odnośnie przesyłania wiadomości, różnicy między przetwarzaniem asynchronicznym i nieblokującym, a także między współbieżnością i przetwarzaniem równoległym, zasady działania supervisorów, zmiany zachowania przez become, routers i dispatchers,
+    podstawowa znajomość Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”).
+
+Uczestnicy kursu powinni przynieść własny laptop z zainstalowaną Javą 6 lub nowszą.
 
 Uczestnictwo w szkoleniu zapewnia:
 
-    wiedzę z zakresu używania Akka remoting i clustering
-    praktycznych aspektów integracji z zewnętrznymi systemami
+    wiedzę z zakresu używania Akka remoting i clustering,
+    praktycznych aspektów integracji z zewnętrznymi systemami,
     umiejętność tworzenia RESTfull HTTP Services
-    pewność i wiedzę przy wdrożeniach Akki w przypadku systemów dużej skali
+    oraz pewność i wiedzę przy wdrożeniach Akki w przypadku systemów dużej skali.
 
-Program:
+Program szkolenia:
 
-    przypomnienie podstaw Akki
-    Akka Remoting
-    Akka Clustering
-    Cluster Aware Routers
-    Cluster Singleton
-    Cluster Sharding
-    Akka Persistance
+    przypomnienie podstaw Akki,
+    Akka Remoting,
+    Akka Clustering,
+    Cluster Aware Routers,
+    Cluster Singleton,
+    Cluster Sharding,
+    Akka Persistance.
 
 English version: http://typesafe.com/how/training/advancedakkawithscala
 
@@ -194,16 +198,16 @@ Uczestnictwo w szkoleniu zapewnia:
 
 Program:
 
-    wstęp i podstawy Play! framework
-    formularze
-    internacjonalizacja
-    testowanie aplikacji
-    zarządzanie zasobami multimedialnymi aplikacji
-    obsługa sesji i żądań HTTP
-    wykorzystanie i budowanie Web Services
-    obsługa JSON
-    asynchroniczne programowanie w Play! Framework
-    wykorzystanie biblioteki Slick
+    wstęp i podstawy Play! framework,
+    formularze,
+    internacjonalizacja,
+    testowanie aplikacji,
+    zarządzanie zasobami multimedialnymi aplikacji,
+    obsługa sesji i żądań HTTP,
+    wykorzystanie i budowanie Web Services,
+    obsługa JSON,
+    asynchroniczne programowanie w Play! Framework,
+    wykorzystanie biblioteki Slick.
 
 Kurs jest zgodny z kursem Typesafe:  http://typesafe.com/how/training/fasttracktoplaywithscala
 
