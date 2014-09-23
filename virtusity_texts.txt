@@ -1,7 +1,7 @@
 ﻿
 Fast Track to Scala
 
-Przedstawiamy dwudniowe warsztaty stworzone specjalnie by dostarczyć programistom wiedzy niezbędnej do rozpoczęcia programowania w Scali. Jeśli masz już doświadczenie w innych językach programowania takich jak Java, C++, C# czy Ruby i chciałbyś zdobyć wiedzę na temat tego obiektowo-funkcyjnego języka pod okiem doświadczonych trenerów, to ten kurs jest dla Ciebie.
+Przedstawiamy dwudniowe warsztaty stworzone specjalnie, by dostarczyć programistom wiedzy niezbędnej do rozpoczęcia programowania w Scali. Jeśli masz już doświadczenie w innych językach programowania takich jak Java, C++, C# czy Ruby i chciałbyś zdobyć wiedzę na temat tego obiektowo-funkcyjnego języka pod okiem doświadczonych trenerów, to ten kurs jest dla Ciebie.
 
 Trener
 
@@ -9,7 +9,7 @@ Trener zostanie wybrany z zespołu szkoleniowego VirtusLab bądź Typesafe, kied
 
 Opis
 
-Przebieg tego dwudniowego kursu bazuje na stopniowym rozwiązywaniu praktycznych problemów, co zapewnia dobre zrozumienie podstaw Scali, przegląd dostępnych narzędzi oraz całego procesu tworzenia oprogramowania. Dodatkowo program zajęć pozwola docenić użyteczność bardziej zaawansowanych funkcji tego obiektowo-funkcyjnego języka.
+Przebieg tego dwudniowego kursu bazuje na stopniowym rozwiązywaniu praktycznych problemów, co zapewnia dobre zrozumienie podstaw Scali, przegląd dostępnych narzędzi oraz całego procesu tworzenia oprogramowania. Dodatkowo program zajęć pozwala docenić użyteczność bardziej zaawansowanych funkcji tego obiektowo-funkcyjnego języka.
 
 Kurs nie zakłada wcześniejszej znajomości Scali, ale jeśli posiadasz już doświadczenie w programowaniu w tym języku, to może być dobrą okazją do odświeżenia wiedzy i zdobycia certyfikatu. Szkolenie jest oficjalnie akredytowane przez Typesafe Inc.
 
@@ -52,8 +52,8 @@ Trener zostanie wybrany z zespołu szkoleniowego VirtusLab bądź Typesafe, kied
 
 Opis
 
-Szkolenie zostało stworzone aby pomóc programistom w pełni zrozumieć tematy związane z zaawansowanym programowaniem obiektowo-funkcyjnym, możliwościami systemu typów w Scali, implicitami i kolekcjami.
-Podczas zajęć zaprezentowane zostaną techniki wykorzystania języka do tworzenia dobrze zaprojektowanych bibliotek czy DSLi. Wszystkie ćwiczenia oparte są na rozwiązywaniu konkretnego problemu.
+Szkolenie zostało stworzone, aby pomóc programistom w pełni zrozumieć tematy związane z zaawansowanym programowaniem obiektowo-funkcyjnym, możliwościami systemu typów w Scali, implicitami i kolekcjami.
+Podczas zajęć zaprezentowane zostaną techniki wykorzystania języka do tworzenia dobrze zaprojektowanych bibliotek czy DSL-i. Wszystkie ćwiczenia oparte są na rozwiązywaniu konkretnego problemu.
 
 Szkolenie jest oficjalnie akredytowane przez Typesafe Inc. oraz umożliwia uzyskanie certyfikatu.
 
@@ -62,14 +62,14 @@ Wymagania wstępne:
     podstawowa znajomość Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”)
     i co najmniej dwumiesięczne doświadczenie w programowaniu w Scali.
 
-Uczestnicy powinni przynieść własny komputer/laptop z zainstalowaną Javą 6 lub nowszą.
+Podczas kursu potrzebny będzie własny laptop/komputer z zainstalowaną Javą 6 lub nowszą.
 
 Po ukończeniu tego kursu:
 
     zrozumiesz zaawansowane aspektów programowania obiektowo-funkcyjnego w Scali,
     poznasz i nauczysz się stosować w praktyce systemu typów Scali,
     zrozumiesz implicity oraz wzorzec 'type class'
-    oraz nauczysz się projektować i tworzenia bibliotek oraz DSLi w Scali.
+    oraz nauczysz się projektować i tworzenia bibliotek oraz DSL-i w Scali.
 
 Program szkolenia:
 
@@ -77,7 +77,7 @@ Program szkolenia:
     zaawansowane elementy podejścia obiektowo-funkcyjnego,
     pogłębienie wiedzy na temat systemu typów w Scali,
     explicitly implicit,
-    tworzenie wewnętrznych DSLi,
+    tworzenie wewnętrznych DSL-i,
     implementacja własnych kolekcji w Scali.
 
 Kurs jest zgodny z kursem Typesafe:  http://typesafe.com/how/training/advancedscala
@@ -101,7 +101,7 @@ Wymagania wstępne:
 
     podstawowa znajomość Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”).
 
-Uczestnicy kursu powinni przynieść własny komputer/laptop z zainstalowaną Javą 6 lub nowszą.
+Podczas kursu potrzebny będzie własny laptop/komputer z zainstalowaną Javą 6 lub nowszą.
 
 Uczestnictwo w szkoleniu zapewnia:
 
@@ -147,7 +147,7 @@ Wymagania wstępne:
     co najmniej dwa miesiące praktycznego doświadczenia w Akce oraz Scali - w tym wiedza odnośnie przesyłania wiadomości, różnicy między przetwarzaniem asynchronicznym i nieblokującym, a także między współbieżnością i przetwarzaniem równoległym, zasady działania supervisorów, zmiany zachowania przez become, routers i dispatchers,
     podstawowa znajomość Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”).
 
-Uczestnicy kursu powinni przynieść własny laptop z zainstalowaną Javą 6 lub nowszą.
+Podczas kursu potrzebny będzie własny laptop/komputer z zainstalowaną Javą 6 lub nowszą.
 
 Uczestnictwo w szkoleniu zapewnia:
 
@@ -188,7 +188,8 @@ Wymagania wstępne:
 
     podstawowa znajomość Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”)
     doświadczenie z HTML oraz JavaScript
-    uczestnicy powinni przynieść własny laptop z zainstalowaną Javą 6 lub nowszą
+	
+Podczas kursu potrzebny będzie własny laptop/komputer z zainstalowaną Javą 6 lub nowszą.
 
 Uczestnictwo w szkoleniu zapewnia:
 
