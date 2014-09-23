@@ -1,0 +1,225 @@
+
+Fast Track to Scala
+
+Przedstawiamy dwudniowe warsztaty zaprojektowane dla programistów, których celem jest dostarczenie wiedzy niezbêdnej do rozpoczêcia programowania w Scali. Jeœli masz ju¿ doœwiadczenie w innych jêzykach programowania takich jak Java, C++, C# b¹dŸ Ruby i chcia³byœ zdobyæ wiedzê na temat tego obiektowo-funkcyjnego jêzyka pod okiem doœwiadczonych trenerów to ten kurs jest dla Ciebie.
+
+Trener
+
+Trener zostanie wybrany z zespo³u szkoleniowego VirtusLab b¹dŸ Typesafe kiedy zostanie ustalona konkretna data szkolenia.
+
+Opis
+
+Przebieg tego dwudniowego kursu bazuje na stopniowo budowanym rozwi¹zaniu praktycznych problemów co zapewni dobre zrozumienie podstaw Scali, przegl¹d dostêpnych narzêdzi oraz ca³ego procesu tworzenia oprogramowania. Dodatkowo program zajêæ pozwoli doceniæ u¿ytecznoœæ bardziej zaawansowanych funkcji tego obiektowo-funkcyjnego jêzyka.
+
+Program nie zak³ada wczeœniejszej znajomoœci Scali ale jeœli posiadasz ju¿ doœwiadczenie w programowaniu w tym jêzyku to kurs ten mo¿e byæ dobr¹ okazj¹ do odœwie¿enia wiedzy i zdobycia certyfikatu. Szkolenie jest oficjalnie akredytowane przez Typesafe, Inc.
+
+Wymagania wstêpne:
+
+    znajomoœæ innego jêzyka programowania takiego jak Java, C#, C++ lub Ruby
+    podczas kursu potrzebny bêdzie w³asny laptop z zainstalowan¹ Jav¹ 6 lub wy¿sz¹
+
+Uczestnictwo w szkoleniu zapewnia:
+
+    efektywne programowanie w Scali
+    znajomoœæ i umiejêtnoœæ programowania funkcyjnego w Scali
+    umiejêtnoœæ pos³ugiwania siê podstawowymi narzêdziami dostêpnymi w ekosystemie Scali
+    pewnoœæ u¿ywania Scali w komercyjnych projektach
+    certyfikat potwierdzaj¹cy przebrniêcie kursu
+
+Program:
+
+    wstêp
+    podstawy Scali
+    przegl¹d OO
+    testowanie aplikacji
+    kolekcje i programowanie funkcyjne
+    for-expressions i pêtle
+    traits oraz dziedziczenie
+    pattern matching
+    u¿ywanie wartoœci opcjonalnych
+
+Kurs jest zgodny z kursem Typesafe:  http://typesafe.com/how/training/fasttracktoscala
+
+------------------------------------------
+Advanced Scala
+
+Warsztaty Advanced Scala s³u¿¹ poznaniu zaawansowanych funkcjonalnoœci jêzyka. Jeœli posiadasz ju¿ podstawowe doœwiadczenie w programowaniu w Scali kurs ten pozwoli na pog³êbienie wiedzy z programowania obiektowo-funkcyjnego oraz poznanie sposobów tworzenia DSL’i czy wykorzystania mo¿liwoœci systemu typów jêzyka.
+
+Trener
+
+Trener zostanie wybrany z zespo³u szkoleniowego VirtusLab b¹dŸ Typesafe kiedy zostanie ustalona konkretna data szkolenia.
+
+Opis
+
+Szkolenie zosta³o zaprojektowane tak, aby pomóc programistom w pe³ni zrozumieæ tematy zwi¹zane z zaawansowanym programowaniem obiektowo-funkcyjnym, mo¿liwoœciami systemu typów w Scali, implicit’ami czy kolekcjami.
+Podczas zajêæ zaprezentowane zostan¹ techniki wykorzystania funkcjonalnoœci jêzyka do tworzenia dobrze zaprojektowanych bibliotek czy DSL’i. Wszystko w ramach budowania rozwi¹zania dla praktycznego przypadku u¿ycia.
+
+Szkolenie jest oficjalnie akredytowane przez Typesafe, Inc oraz umo¿liwia uzyskanie certyfikatu.
+
+Wymagania wstêpne:
+
+    podstawowa znajomoœæ Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”)
+    co najmniej dwumiesiêczne doœwiadczenie w programowaniu w Scali
+    uczestnicy powinni przynieœæ w³asnego laptopa z zainstalowan¹ Jav¹ 6 lub nowsz¹
+
+Uczestnictwo w szkoleniu zapewnia:
+
+    zrozumienie wszystkich aspektów programowania obiektowo-funkcyjnego
+    znajomoœæ i umiejêtnoœæ stosowania w praktyce systemu typów w Scali
+    zrozumienie implicit’ów oraz type class
+    umiejêtnoœæ projektowania i tworzenia bibliotek i DSL’i w Scali
+
+Program:
+
+    przypomnienie podstaw Scali
+    zaawansowane elementy podejœcia obiektowo-funkcyjnego
+    pog³êbienie wiedzy na temat systemu typów w Scali
+    explicitly implicit
+    tworzenie wewnêtrznych DSL’i
+    custom Scala collections
+
+Kurs jest zgodny z kursem Typesafe:  http://typesafe.com/how/training/advancedscala
+
+--------------------------------------------------
+Fast Track to Akka with Scala
+
+Reactive Akka! – Te dwudniowe warsztaty to idealna okazja, aby poznaæ t¹ rewelacyjn¹ bibliotekê oraz metodologie i praktyki pozwalaj¹ce na tworzenie systemów opartych na modelu aktora. Podczas kursu praktyczne æwiczenia krok po kroku poka¿¹ jak zbudowaæ aplikacje oparte na zdarzeniach oraz odporne na b³êdy i awarie.
+
+Trener
+
+Trener zostanie wybrany z zespo³u szkoleniowego VirtusLab b¹dŸ Typesafe kiedy zostanie ustalona konkretna data szkolenia.
+
+Opis
+
+Dwudniowy kurs opiera siê na kolejno budowanych rozwi¹zaniach praktycznego problemu, które na koniec prowadz¹ do w pe³ni funkcjonalnej, opartej na zdarzeniach, aplikacji zaimplementowanej z u¿yciem Akki. Szkolenie skupia siê na wykorzystaniu Akki w ramach pojedynczej maszyny JVM. Wskazane jest posiadanie doœwiadczenia w budowaniu aplikacji backend’owych.
+
+Szkolenie jest oficjalnie akredytowane przez Typesafe, Inc oraz umo¿liwia uzyskanie certyfikatu.
+
+Wymagania wstêpne:
+
+    podstawowa znajomoœæ Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”)
+    uczestnicy kursu powinni przynieœæ w³asnego laptopa z zainstalowan¹ Jav¹ 6 lub nowsz¹.
+
+Uczestnictwo w szkoleniu zapewnia:
+
+    wiedzê jak zaprojektowaæ skalowalne i odporne na b³êdy aplikacje w Akkce
+    umiejêtnoœæ konfiguracji i testowania aplikacji w Akkce
+    znajomoœæ najlepszych praktyk z zakresu projektowania systemów asynchronicznych opartych na zdarzeniach (event-driven) u¿ywaj¹c Akki
+    pewnoœæ wykorzystania Akki na produkcji
+
+Program:
+
+    wstêp
+    podstawy modelu aktora
+    testowanie aktorów
+    cykl ¿ycia aktorów
+    odpornoœæ na b³êdy i awarie
+    routers, dispatchers
+    zmiana zachowania aktorów w czasie
+    wzorzec Ask
+    FSM
+    Akka Extensions
+
+Kurs jest zgodny z kursem Typesafe: http://typesafe.com/how/training/fasttracktoakkawithscala
+
+-----------------------------------------------
+Advanced Akka with Scala
+
+Prezentujemy dwudniowy, zaawansowany kurs budowania rozproszonych, reaktywnych aplikacji przy u¿yciu Akki i Scali. Szkolenie przeznaczone jest dla programistów posiadaj¹cych ju¿ doœwiadczenie w tworzeniu aplikacji w Scali i Akkce i chc¹cych poznaæ metody rozpraszania aplikacji na wiele wêz³ów oraz metody integracji z zewnêtrznymi systemami.
+
+Trener
+
+Trener zostanie wybrany z zespo³u szkoleniowego VirtusLab b¹dŸ Typesafe kiedy zostanie ustalona konkretna data szkolenia.
+
+Opis
+
+Szkolenie jest adresowane do programistów, którzy posiadaj¹ ju¿ podstawy wiedzy z zakresu tworzenia aplikacji przy u¿yciu Akki oraz Scali na pojedynczej maszynie JVM i chcieliby poznaæ techniki rozpraszania systemu na wiele wêz³ów oraz integracji z systemami zewnêtrznymi.
+Advanced Akka to skuteczne szkolenie, które przedstawia rozleg³e przyk³ady oraz praktyczne æwiczenia prowadz¹ce do budowy w pe³ni funkcjonalnego rozproszonego systemu zbudowanego na modelu aktora.
+
+Szkolenie jest oficjalnie akredytowane przez Typesafe, Inc oraz umo¿liwia uzyskanie certyfikatu.
+
+Wymagania wstêpne:
+
+    znajomoœæ Akki (zgodnie z zakresem szkolenia “Fast Track to Akka with Scala”)
+    co najmniej dwa miesi¹ce praktycznego doœwiadczenia w Akkce oraz Scali w tym wiedza odnoœnie przesy³ania wiadomoœci, ró¿nicy miêdzy przetwarzaniem asynchronous i non-blocking oraz miêdzy wspó³bie¿noœci¹ i przetwarzaniem równoleg³ym, zasady dzia³ania supervisorów, zmiany zachowania przez become, routers i dispatchers
+    podstawowa znajomoœæ Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”)
+    uczestnicy kursu powinni przynieœæ w³asnego laptopa z zainstalowan¹ Jav¹ 6 lub nowsz¹.
+
+Uczestnictwo w szkoleniu zapewnia:
+
+    wiedzê z zakresu u¿ywania Akka remoting i clustering
+    praktycznych aspektów integracji z zewnêtrznymi systemami
+    umiejêtnoœæ tworzenia RESTfull HTTP Services
+    pewnoœæ i wiedzê przy wdro¿eniach Akki przy systemach du¿ej skali
+
+Program:
+
+    przypomnienie podstaw Akki
+    Akka Remoting
+    Akka Clustering
+    Cluster Aware Routers
+    Cluster Singleton
+    Cluster Sharding
+    Akka Persistance
+
+English version: http://typesafe.com/how/training/fasttracktoakkawithscala
+
+------------------------------------------------------
+Fast Track to Play with Scala
+
+Ten dwudniowy kurs wprowadza doœwiadczonych web-developerów we wzorce projektowe oraz metodologiê niezbêdn¹ do zbudowania reaktywnych, skalowalnych aplikacji przy u¿yciu Play! Framework oraz Scali.
+
+Trener
+
+Trener zostanie wybrany z zespo³u szkoleniowego VirtusLab b¹dŸ Typesafe kiedy zostanie ustalona konkretna data szkolenia.
+
+Opis
+
+Celem szkolenia jest dostarczenie uczestnikom wiedzy oraz umiejêtnoœci niezbêdnych tworzenia w pe³ni funkcjonalnych aplikacji webowych w Play! Framework. Czêœci¹ kursu jest wprowadzenie do biblioteki Slick.
+Wszystko to dziêki praktycznym æwiczeniom, które prowadz¹ do powstania dzia³aj¹cej aplikacji w trakcie trwania szkolenia.
+
+Szkolenie jest oficjalnie akredytowane przez Typesafe, Inc oraz
+umo¿liwia uzyskanie certyfikatu.
+
+Wymagania wstêpne:
+
+    podstawowa znajomoœæ Scali (zgodnie z zakresem szkolenia “Fast Track to Scala”)
+    doœwiadczenie z HTML oraz JavaScript
+    uczestnicy powinni przynieœæ w³asnego laptopa z zainstalowan¹ Jav¹ 6 lub nowsz¹
+
+Uczestnictwo w szkoleniu zapewnia:
+
+    wiedzê jak zbudowaæ kompletne aplikacje u¿ywaj¹c Play! Framework
+    znajomoœæ najlepszych praktyk dla tworzenia aplikacji webowych z wykorzystaniem Play! Framework
+    pewnoœæ wykorzystania Scali oraz Play! Framework w systemach produkcyjnych
+
+Program:
+
+    wstêp i podstawy Play! framework
+    formularze
+    internacjonalizacja
+    testowanie aplikacji
+    zarz¹dzanie zasobami multimedialnymi aplikacji
+    obs³uga sesji i ¿¹dañ HTTP
+    wykorzystanie i budowanie Web Services
+    obs³uga JSON
+    asynchroniczne programowanie w Play! Framework
+    wykorzystanie biblioteki Slick
+
+Kurs jest zgodny z kursem Typesafe:  http://typesafe.com/how/training/fasttracktoplaywithscala
+
+-------------------------------------------------
+O nas
+
+Virtusity to centrum szkoleniowe oferuj¹ce szkolenia IT w Polsce. Nasze szkolenia dobrane s¹ tak aby pokryæ najbardziej istotne aspekty procesu produkcji oprogramowania a tak¿e rozwijaj¹ce siê trendy i technologie – jak choæby reactive programming, realizuj¹ce ideê Reactive Manifesto. Rozpoczynamy oferuj¹c szkolenia autoryzowane firmy Typesafe, Inc. ale kolejne tematy bêd¹ sukcesywnie dodawane.
+Ka¿dy, niezale¿nie od doœwiadczenia, bêdzie mia³ mo¿liwoœæ poznania nowych technologii jak i korzyœci, które wynikaj¹ z ich stosowania.
+
+Nasz zespó³ tworz¹ profesjonaliœci z firmy VirtusLab oraz firm partnerskich. Ka¿dy z nich posiada imponuj¹ce, wieloletnie doœwiadczenie w pracy z narzêdziami, którym dzieli siê podczas szkolenia.
+
+Szybkie tworzenie nowych funkcjonalnoœci to jeden z najwa¿niejszych czynników decyduj¹cych o powodzeniu danego projektu, od którego niejednokrotnie uzale¿niona jest kondycja ca³ego przedsiêbiorstwa. Przy presji czasowej na dostarczanie funkcjonalnoœci ciê¿ko jest wygospodarowaæ doœæ czasu na pe³ny rozwój kompetencji zespo³u programistów. Dobr¹ drog¹ do poprawy produktywnoœci jest szybkie zdobywanie skoncentrowanej wiedzy pod okiem najlepszych specjalistów w danej dziedzinie w ramach naszych szkoleñ.
+
+Praca w IT to jednak nie tylko konkretne narzêdzia i technologie. Nawet programista z wysokimi umiejêtnoœciami technicznymi mo¿e okazaæ siê nieefektywny, je¿eli jego zespó³ nie bêdzie dobrze ze sob¹ wspó³pracowa³. Dlatego te¿, œwiadomi rosn¹cych wymagañ, do naszej oferty ju¿ wkrótce do³¹czymy tematy miêkkie. W nastêpnej kolejnoœci do³¹cz¹ tak¿e szkolenia z aspektów prawnych w IT.
+
+Z dzia³em szkoleniowym Virtusity zwi¹zana jest bezpoœrednio firma Virtuslab, ktora jest pierwszym w tej czêœci europy partnerem firmy Typesafe – twórcy Typesafe Reactive Platform oraz firmy wspieraj¹cej rozwój Scali na œwiecie.
+
+Cenimy wspó³pracê z partnerami, dziêki której mo¿emy zaoferowaæ kompleksow¹ ofertê szkoleñ, realizowanych z wykorzystaniem autoryzowanych materia³ów, które s¹ stosowane na ca³ym œwiecie.
