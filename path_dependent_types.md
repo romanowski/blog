@@ -4,7 +4,7 @@ Let's start with small refreshment of what actually the dependent typing is. Usi
 >In computer science and logic, a dependent type is a type that depends on a value. 
 
 Neat, huh? But what does it mean in practice? If you take a look at the Wikipedia's [list](http://en.wikipedia.org/wiki/Dependent_type#Comparison_of_languages_with_dependent_types)  of languages that implement dependent typing you might get strange sensation that it is something really obscure and esoteric. Languages mentioned there range from "never heard of" (Guru/Matita anyone?) to "yeah, I recall reading about it on Reddit once or twice" (Coq). Oh wait, there is F#. Ooops, sorry, it is not F# but [F*](http://research.microsoft.com/en-us/projects/fstar/) . Thanks goodness it **is** something from Microsoft at least. And look ma', no Haskell.  If it is not implemented in Haskell then truly, what problems can it solve? 
-Well, actually dependent typing is helpful in solving very down-to-earth problems. I bet that everyone programming in a language with sufficiently expressive type system  has wondered at least once - why my type system does not prevent me from, say, accessing head of empty list? This question is in fact the canonical showcase for dependent typing. Just imagine - if you could somehow encode the length of a list (a value) into its type then it'd be trivial to state that list of length 0 (type that depends on a value, mind you) has no head to be accessed. Standard library would have just been changed to (with completely made up syntax):
+Well, actually dependent typing is helpful in solving very down-to-earth problems. I bet that everyone programming in a language with sufficiently expressive type system  has wondered at least once - why my type system does not prevent me from, say, accessing head of empty list? This question is in fact the canonical showcase for dependent typing. Just imagine - if you could somehow encode the length of a list (a value) into its type then it'd be trivial to state that list of length 0 (type that depends on a value, mind you) has no head to be accessed. Standard library would have just been changed to (please bear with my completely made up syntax):
 
 	sealed abstract class List[+A, N is Int]  {
 		//no head here
@@ -78,27 +78,26 @@ Let's stick with the 2nd part for a while. This requirement seems to fit path-de
 	
 Let's check if we can mix moduli from different fields:
 
->scala> val z1 = Z(10000103)
->z1: Z = Z(10000103)
->
->scala> val z2 = Z(20000208)
->z2: Z = Z(20000208)
->
->scala> val m = new z1.Modulus
->m: z1.Modulus = Z$Modulus@6c6cb480
->
->scala> val n: z2.Modulus = m
->error: type mismatch;
-> found   : z1.Modulus
-> required: z2.Modulus
->       val n: z2.Modulus = m
+	scala> val z1 = Z(10000103)
+	z1: Z = Z(10000103)
+
+	scala> val z2 = Z(20000208)
+	z2: Z = Z(20000208)
+
+	scala> val m = new z1.Modulus
+	m: z1.Modulus = Z$Modulus@6c6cb480
+
+	scala> val n: z2.Modulus = m
+	error: type mismatch;
+ 	 found   : z1.Modulus
+	 required: z2.Modulus
 
 
 Good, no way to do harm. Having done this, let's try to define a type representing an integer mod some modulus.
 
 	class IntMod[N <: Z#Modulus] private(val value: Long) extends AnyVal
 
-In other words, our "integer mod N" is parameterized by the path-dependent Modulus type (notice Z# notation) and by virtue of this the IntMod[z1.Modulus] is an entirely different type from IntMod[z2.Modulus]. This is exactly what we wanted in order to achieve 2 from our little list. By the way, we have made IntMod's constructor private to take a stab at the first point. We don't wanna let anyone instantiate our integers because we want them to be indistinguishable from "real" numerics. We have also made it value type for a good measure, we'd certainly like to squeeze a little bit of performance where possible.
+In other words, our "integer mod N" is parameterized by the path-dependent Modulus type (notice Z# notation) and by virtue of this the IntMod[z1.Modulus] is an entirely different type from IntMod[z2.Modulus]. This is exactly what we wanted in order to achieve 2 from our little list. By the way, we have made IntMod's constructor private to take a stab at the 1st point. We don't wanna let anyone instantiate our integers because we want them to be indistinguishable from "real" numerics. We have also made it value type for a good measure, we'd certainly like to squeeze a little bit of performance where possible.
 So how do we mix IntMods with Scala native types? We need to be able to lift any numeric to our IntMod implicitly. Let's make a companion object to help with this.
 
 	  object IntMod {
@@ -135,24 +134,22 @@ So far so good, but how do we implement the longAsIntModN method? We'll need a v
 
 Let's check how we are doing:
 
->scala> val i1 = 10: IntMod[z1.Modulus]
->i1: IntMod[z1.Modulus] = IntMod@a
->
->scala> val i2 = 100000000: IntMod[z1.Modulus]
->i2: IntMod[z1.Modulus] = IntMod@9892e1
->
->scala> i2.value
->res1: Long = 9999073
->
->scala> val i3 = 10: IntMod[z2.Modulus]
->i3: IntMod[z2.Modulus] = IntMod@a
->
->scala> val i4: IntMod[z2.Modulus] = i1
-> error: type mismatch;
-> found   : IntMod[z1.Modulus]
-> required: IntMod[z2.Modulus]
->       val i4: IntMod[z2.Modulus] = i1
+	scala> val i1 = 10: IntMod[z1.Modulus]
+	i1: IntMod[z1.Modulus] = IntMod@a
 
+	scala> val i2 = 100000000: IntMod[z1.Modulus]
+	i2: IntMod[z1.Modulus] = IntMod@9892e1
+
+	scala> i2.value
+	res1: Long = 9999073
+
+	scala> val i3 = 10: IntMod[z2.Modulus]
+	i3: IntMod[z2.Modulus] = IntMod@a
+
+	scala> val i4: IntMod[z2.Modulus] = i1
+	error: type mismatch;
+	 found   : IntMod[z1.Modulus]
+	 required: IntMod[z2.Modulus]
 
 Lookin' good, huh? Actually, we have almost completed our task. What remains is just to implement missing algebraic operations. And our implicit conversions render it a trivial task (mostly, [division](http://en.wikipedia.org/wiki/Modular_multiplicative_inverse) is tricky). 
 
@@ -168,21 +165,20 @@ Lookin' good, huh? Actually, we have almost completed our task. What remains is 
 	  }
 
 
->scala> val ring = Z(20000208)
->ring: Z = Z(20000208)
->
->scala> type Q = ring.Modulus
->defined type alias Q
->
->scala> val k = (10000: IntMod[Q]) * 100000
->k: IntMod[Q] = IntMod@1310530
->
->scala> val l = k + 10000000
->l: IntMod[Q] = IntMod@986de0
->
->scala> val m = l * k
->m: IntMod[Q] = IntMod@8cfff0
->
->scala> m.value
->res0: Long = 9240560
->
+	scala> val ring = Z(20000208)
+	ring: Z = Z(20000208)
+
+	scala> type Q = ring.Modulus
+	defined type alias Q
+
+	scala> val k = (10000: IntMod[Q]) * 100000
+	k: IntMod[Q] = IntMod@1310530
+
+	scala> val l = k + 10000000
+	l: IntMod[Q] = IntMod@986de0
+
+	scala> val m = l * k
+	m: IntMod[Q] = IntMod@8cfff0
+
+	scala> m.value
+	res0: Long = 9240560
