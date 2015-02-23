@@ -36,7 +36,7 @@ Would it be possible to overcome these limitations and have a simple value <-> t
 You need to know that Scala has a notion of a type dependent on a value. Only that the notion of dependency is not expressed in type signature but rather in type *placement*. Martin Odersky outlined this idea in a co-authored paper [Foundations of Path-Dependent Types](http://lampwww.epfl.ch/~amin/dot/fpdt.pdf) where we read:
 > (...) types must be able to refer to objects, i.e. contain terms that serve as static approximation of a set of dynamic objects. In other words, some level of dependent types is required; the usual notion is that of *path-dependent* types.
 
-I found pretty nice and suggestive introduction to path dependent types [here](http://danielwestheide.com/blog/2013/02/13/the-neophytes-guide-to-scala-part-13-path-dependent-types.html) . To recap, let's contemplate for a minute the following snippet:
+I found pretty nice and suggestive introduction to path dependent types [here](http://danielwestheide.com/blog/2013/02/13/the-neophytes-guide-to-scala-part-13-path-dependent-types.html) . You can find a good read on this topic in ktoso's [vademecum of types](http://ktoso.github.io/scala-types-of-types/#path-dependent-type) as well.  To recap, let's contemplate for a minute the following snippet:
 
 	class A {
 	  class B
