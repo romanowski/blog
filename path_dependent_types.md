@@ -5,25 +5,26 @@ Let's start with small refreshment of what actually the dependent typing is. Usi
 
 Neat, huh? But what does it mean in practice? If you take a look at the Wikipedia's [list](http://en.wikipedia.org/wiki/Dependent_type#Comparison_of_languages_with_dependent_types)  of languages that implement dependent typing you might get strange sensation that it is something really obscure and esoteric. Languages mentioned there range from "never heard of" (Guru/Matita anyone?) to "yeah, I recall reading about it on Reddit once or twice" (Coq). Oh wait, there is F#. Ooops, sorry, it is not F# but [F*](http://research.microsoft.com/en-us/projects/fstar/) . Thanks goodness it **is** something from Microsoft at least. And look ma', no Haskell.  If it is not implemented in Haskell then truly, what problems can it solve? 
 Well, actually dependent typing is helpful in solving very down-to-earth problems. I bet that everyone programming in a language with sufficiently expressive type system  has wondered at least once - why my type system does not prevent me from, say, accessing head of empty list? This question is in fact the canonical showcase for dependent typing. Just imagine - if you could somehow encode the length of a list (a value) into its type then it'd be trivial to state that list of length 0 (type that depends on a value, mind you) has no head to be accessed. Standard library would have just been changed to (please bear with my completely made up syntax):
+```scala
+sealed abstract class List[+A, N is Int]  {
+	//no head here
+}
 
-	sealed abstract class List[+A, N is Int]  {
-		//no head here
-	}
+case object Nil extends List[Nothing, 0] {
+  	// no head here either
+}
 
-	case object Nil extends List[Nothing, 0] {
-	  	// no head here either
-	}
-
-	sealed abstract class NonEmptyList extends List[+A, n where n > 0] {
-		def head: A
-	}
+sealed abstract class NonEmptyList extends List[+A, n where n > 0] {
+	def head: A
+}
+```
 
 Oh, by the way, just observe what you could have achieved when it comes to concatenation:
-
-	final case class ::[B](override val head: B, var tl: List[B, n]) extends List[B, (n + 1)] {
-	  override def tail : List[B, n] = tl
-	}
-
+```scala
+final case class ::[B](override val head: B, var tl: List[B, n]) extends List[B, (n + 1)] {
+  override def tail : List[B, n] = tl
+}
+```
 See how you would have been able to track the actual length of the list throughout the program by saying that eg. appending an element to a list of length **n** produces list with length **n + 1**.
 Curious reader will notice that a concept of separation empty and non-empty lists is already present in Scalaz [NonEmptyList](http://docs.typelevel.org/api/scalaz/nightly/index.html#scalaz.NonEmptyList) . That's true, but observe how calling tail of NonEmptyList produces an ordinary List with no extra guarantees. That's because at this point the type system cannot tell apart lists of length 1 (which tails are obviously empty) and longer lists. Of course you could try to remedy this problem by introducing  *OneElementList* type with appropriate tail/head signatures but this remedy quickly falls short when you discover that you really want List to have drop(n: Int) method and you just can't express that, because there is no way to tell what is the type of the result when there is no "link" between values' world and types' world.
 
@@ -37,18 +38,18 @@ You need to know that Scala has a notion of a type dependent on a value. Only th
 > (...) types must be able to refer to objects, i.e. contain terms that serve as static approximation of a set of dynamic objects. In other words, some level of dependent types is required; the usual notion is that of *path-dependent* types.
 
 I found pretty nice and suggestive introduction to path dependent types [here](http://danielwestheide.com/blog/2013/02/13/the-neophytes-guide-to-scala-part-13-path-dependent-types.html) . You can find a good read on this topic in ktoso's [vademecum of types](http://ktoso.github.io/scala-types-of-types/#path-dependent-type) as well.  To recap, let's contemplate for a minute the following snippet:
-
-	class A {
-	  class B
-	  var b: Option[B] = None
-	}
-	val a1 = new A
-	val a2 = new A
-	val b1 = new a1.B
-	val b2 = new a2.B
-	a1.b = Some(b1)
-	a2.b = Some(b1) // does not compile
-
+```scala
+class A {
+  class B
+  var b: Option[B] = None
+}
+val a1 = new A
+val a2 = new A
+val b1 = new a1.B
+val b2 = new a2.B
+a1.b = Some(b1)
+a2.b = Some(b1) //does not compile
+```
 When you have become enlightened we will be proceeding to the main part of this post. That is, how on earth I used that when solving one of the [Codility](https://codility.com/) [challenges](https://codility.com/programmers/challenges/)?
 
 #####Problem to solve
@@ -69,116 +70,121 @@ To summarize, we need to devise a system that lets us:
 2. be sure that compiler won't let us use int mod N as int mod M
 
 Let's stick with the 2nd part for a while. This requirement seems to fit path-dependent typing nicely. We need to make sure that whenever we operate on a modulus it comes from an unique "path", so the compiler can track it for us. This "path"'s got to be represented by some type. Let's call this type Z to mimic mathematical notation (we can say that it represents a finite field for some N)
-
-	case class Z(modulus: Int) {
-	    sealed class Modulus {
-	      val value = modulus
-	    }
-  	}
+```scala
+case class Z(modulus: Int) {
+    sealed class Modulus {
+      val value = modulus
+    }
+}
+```
 	
 Let's check if we can mix moduli from different fields:
+```scala
+scala> val z1 = Z(10000103)
+z1: Z = Z(10000103)
 
-	scala> val z1 = Z(10000103)
-	z1: Z = Z(10000103)
+scala> val z2 = Z(20000208)
+z2: Z = Z(20000208)
 
-	scala> val z2 = Z(20000208)
-	z2: Z = Z(20000208)
+scala> val m = new z1.Modulus
+m: z1.Modulus = Z$Modulus@6c6cb480
 
-	scala> val m = new z1.Modulus
-	m: z1.Modulus = Z$Modulus@6c6cb480
-
-	scala> val n: z2.Modulus = m
-	error: type mismatch;
- 	 found   : z1.Modulus
-	 required: z2.Modulus
-
+scala> val n: z2.Modulus = m
+error: type mismatch;
+ found   : z1.Modulus
+ required: z2.Modulus
+```
 
 Good, no way to do harm. Having done this, let's try to define a type representing an integer mod some modulus.
-
-	class IntMod[N <: Z#Modulus] private(val value: Long) extends AnyVal
+```scala	
+class IntMod[N <: Z#Modulus] private(val value: Long) extends AnyVal 
+```
 
 In other words, our "integer mod N" is parameterized by the path-dependent Modulus type (notice Z# notation) and by virtue of this the IntMod[z1.Modulus] is an entirely different type from IntMod[z2.Modulus]. This is exactly what we wanted in order to achieve 2 from our little list. By the way, we have made IntMod's constructor private to take a stab at the 1st point. We don't wanna let anyone instantiate our integers because we want them to be indistinguishable from "real" numerics. We have also made it value type for a good measure, we'd certainly like to squeeze a little bit of performance where possible.
 So how do we mix IntMods with Scala native types? We need to be able to lift any numeric to our IntMod implicitly. Let's make a companion object to help with this.
-
-	  object IntMod {
-	    implicit def intAsIntModN[N <: Z#Modulus](i: Int) = ???
-	    implicit def longAsIntModN[N <: Z#Modulus](i: Long) = ???
+```scala
+object IntMod {
+    implicit def intAsIntModN[N <: Z#Modulus](i: Int) = ???
+    implicit def longAsIntModN[N <: Z#Modulus](i: Long) = ???
 	
-	    implicit def intModN2Long(a: IntMod[_]): Long = a.value
+    implicit def intModN2Long(a: IntMod[_]): Long = a.value
 	
-	    implicit def intModN2Int(a: IntMod[_]): Int = a.value.toInt
-	  }
+    implicit def intModN2Int(a: IntMod[_]): Int = a.value.toInt
+}
+```
 
 So far so good, but how do we implement the longAsIntModN method? We'll need a value of (correctly-typed) modulus for this. Where can we get one from? Well, let's make it an implicit parameter and take advantage of the fact that type parameters are searched in the process of implicit resolution. In other words, if we introduced a Modulus companion object producing the implicit, it'd be resolved from there.  After these changes our code looks like this:
-
-	  case class Z(modulus: Int) {
-	    sealed class Modulus {
-	      val value = modulus
-	    }
+```scala
+case class Z(modulus: Int) {
+    sealed class Modulus {
+	val value = modulus
+}
 	
-	    object Modulus {
-	      implicit val mod = new Modulus()
-	    }
-	  }
+object Modulus {
+      implicit val mod = new Modulus()
+    }
+}
 	
-	  class IntMod[N <: Z#Modulus] private(val value: Long) extends AnyVal 
+class IntMod[N <: Z#Modulus] private(val value: Long) extends AnyVal 
 	
-	  object IntMod {
-	    implicit def intAsIntModN[N <: Z#Modulus](i: Int)(implicit modulus: N): IntMod[N] = new IntMod[N](i % modulus.value)
-	    implicit def longAsIntModN[N <: Z#Modulus](i: Long)(implicit modulus: N): IntMod[N] = new IntMod[N](i % modulus.value)
+object IntMod {
+    implicit def intAsIntModN[N <: Z#Modulus](i: Int)(implicit modulus: N): IntMod[N] = new IntMod[N](i % modulus.value)
+    implicit def longAsIntModN[N <: Z#Modulus](i: Long)(implicit modulus: N): IntMod[N] = new IntMod[N](i % modulus.value)
 	
-	    implicit def intModN2Long(a: IntMod[_]): Long = a.value
+    implicit def intModN2Long(a: IntMod[_]): Long = a.value
 	
-	    implicit def intModN2Int(a: IntMod[_]): Int = a.value.toInt
-	  }
+    implicit def intModN2Int(a: IntMod[_]): Int = a.value.toInt
+}
+```
 
 Let's check how we are doing:
+```scala
+scala> val i1 = 10: IntMod[z1.Modulus]
+i1: IntMod[z1.Modulus] = IntMod@a
 
-	scala> val i1 = 10: IntMod[z1.Modulus]
-	i1: IntMod[z1.Modulus] = IntMod@a
+scala> val i2 = 100000000: IntMod[z1.Modulus]
+i2: IntMod[z1.Modulus] = IntMod@9892e1
 
-	scala> val i2 = 100000000: IntMod[z1.Modulus]
-	i2: IntMod[z1.Modulus] = IntMod@9892e1
+scala> i2.value
+res1: Long = 9999073
 
-	scala> i2.value
-	res1: Long = 9999073
+scala> val i3 = 10: IntMod[z2.Modulus]
+i3: IntMod[z2.Modulus] = IntMod@a
 
-	scala> val i3 = 10: IntMod[z2.Modulus]
-	i3: IntMod[z2.Modulus] = IntMod@a
-
-	scala> val i4: IntMod[z2.Modulus] = i1
-	error: type mismatch;
-	 found   : IntMod[z1.Modulus]
-	 required: IntMod[z2.Modulus]
-
+scala> val i4: IntMod[z2.Modulus] = i1
+error: type mismatch;
+ found   : IntMod[z1.Modulus]
+ required: IntMod[z2.Modulus]
+```
 Lookin' good, huh? Actually, we have almost completed our task. What remains is just to implement missing algebraic operations. And our implicit conversions render it a trivial task (mostly, [division](http://en.wikipedia.org/wiki/Modular_multiplicative_inverse) is tricky). 
 
+```scala
+class IntMod[N <: Z#Modulus] private(val value: Long) extends AnyVal {
+    def +(x: Long)(implicit m: N): IntMod[N] = value + x
 
-	  class IntMod[N <: Z#Modulus] private(val value: Long) extends AnyVal {
-	    def +(x: Long)(implicit m: N): IntMod[N] = value + x
+    def -(x: Long)(implicit m: N): IntMod[N] = value - x
+
+    def *(x: Long)(implicit m: N): IntMod[N] = value * x
 	
-	    def -(x: Long)(implicit m: N): IntMod[N] = value - x
-	
-	    def *(x: Long)(implicit m: N): IntMod[N] = value * x
-	
-	    def /(x: IntMod[N])(implicit m: N): IntMod[N] = ??? //left as an exercise to the reader
-	  }
+    def /(x: IntMod[N])(implicit m: N): IntMod[N] = ??? //left as an exercise to the reader
+}
+```
+```scala
+scala> val ring = Z(20000208)
+ring: Z = Z(20000208)
 
+scala> type Q = ring.Modulus
+defined type alias Q
 
-	scala> val ring = Z(20000208)
-	ring: Z = Z(20000208)
+scala> val k = (10000: IntMod[Q]) * 100000
+k: IntMod[Q] = IntMod@1310530
 
-	scala> type Q = ring.Modulus
-	defined type alias Q
+scala> val l = k + 10000000
+l: IntMod[Q] = IntMod@986de0
 
-	scala> val k = (10000: IntMod[Q]) * 100000
-	k: IntMod[Q] = IntMod@1310530
+scala> val m = l * k
+m: IntMod[Q] = IntMod@8cfff0
 
-	scala> val l = k + 10000000
-	l: IntMod[Q] = IntMod@986de0
-
-	scala> val m = l * k
-	m: IntMod[Q] = IntMod@8cfff0
-
-	scala> m.value
-	res0: Long = 9240560
+scala> m.value
+res0: Long = 9240560
+```
