@@ -66,6 +66,7 @@ Path-dependent typing to the rescue!!!.
 #####Solution
 
 To summarize, we need to devise a system that lets us:
+
 1. perform modulo computations transparently,
 2. be sure that compiler won't let us use int mod N as int mod M
 
