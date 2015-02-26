@@ -70,7 +70,7 @@ To summarize, we need to devise a system that lets us:
 1. perform modulo computations transparently,
 2. be sure that compiler won't let us use int mod N as int mod M
 
-Let's stick with the 2nd part for a while. This requirement seems to fit path-dependent typing nicely. We need to make sure that whenever we operate on a modulus it comes from an unique "path", so the compiler can track it for us. This "path"'s got to be represented by some type. Let's call this type Z to mimic mathematical notation (we can say that it represents a finite field for some N)
+Let's stick with the 2nd part for a while. This requirement seems to fit path-dependent typing nicely. We need to make sure that whenever we operate on a modulus it comes from an unique "path", so the compiler can track it for us. This path's got to be represented by some type. Let's call this type Z to mimic mathematical notation (we can say that it represents a finite field for some N)
 ```scala
 case class Z(modulus: Int) {
   sealed class Modulus {
