@@ -7,15 +7,15 @@ Neat, huh? But what does it mean in practice? If you take a look at the Wikipedi
 Well, actually dependent typing is helpful in solving very down-to-earth problems. I bet that everyone programming in a language with sufficiently expressive type system  has wondered at least once - why my type system does not prevent me from, say, accessing head of empty list? This question is in fact the canonical showcase for dependent typing. Just imagine - if you could somehow encode the length of a list (a value) into its type then it'd be trivial to state that list of length 0 (type that depends on a value, mind you) has no head to be accessed. Standard library would have just been changed to (please bear with my completely made up syntax):
 ```scala
 sealed abstract class List[+A, N is Int]  {
-	//no head here
+  //no head here
 }
 
 case object Nil extends List[Nothing, 0] {
-  	// no head here either
+  // no head here either
 }
 
 sealed abstract class NonEmptyList extends List[+A, n where n > 0] {
-	def head: A
+  def head: A
 }
 ```
 
@@ -25,7 +25,7 @@ final case class ::[B](override val head: B, var tl: List[B, n]) extends List[B,
   override def tail : List[B, n] = tl
 }
 ```
-See how you would have been able to track the actual length of the list throughout the program by saying that eg. appending an element to a list of length **n** produces list with length **n + 1**.
+See how you would have been able to track the actual length of the list throughout the program by saying that e.g. appending an element to a list of length **n** produces list with length **n + 1**.
 Curious reader will notice that a concept of separation empty and non-empty lists is already present in Scalaz [NonEmptyList](http://docs.typelevel.org/api/scalaz/nightly/index.html#scalaz.NonEmptyList) . That's true, but observe how calling tail of NonEmptyList produces an ordinary List with no extra guarantees. That's because at this point the type system cannot tell apart lists of length 1 (which tails are obviously empty) and longer lists. Of course you could try to remedy this problem by introducing  *OneElementList* type with appropriate tail/head signatures but this remedy quickly falls short when you discover that you really want List to have drop(n: Int) method and you just can't express that, because there is no way to tell what is the type of the result when there is no "link" between values' world and types' world.
 
 Of course there have been attempts to have this neat "link" in Scala.  Make sure you are familiar with ideas behind [Church encoding](http://en.wikipedia.org/wiki/Church_encoding) and then (and **only** then) take a deep dive into renowned [Shapeless](https://github.com/milessabin/shapeless) lib, and its implementation of [type-level naturals](https://github.com/milessabin/shapeless/blob/master/core/src/main/scala/shapeless/nat.scala). It looks like this is what we are looking for here until you realize that out-of-the-box representation takes you only up to 1.000 or so before compiler gives up (1.000 encoded as a type is represented as Succ[Succ[Succ[... _0]]]]) and there is no way to encode a number that is not compile-time constant. But, all in all you are able to do type-level computations and all this is pretty close to the real thing.
@@ -55,7 +55,7 @@ When you have become enlightened we will be proceeding to the main part of this 
 #####Problem to solve
 
 When I feel my algorithmic skills are getting rusty, I usually end up checking Codility's web page and finding myself a challenging problem to work on (BTW, I recommend it to everyone - it simply makes you a better programmer). I always try not only to solve a problem, but also to write the most idiomatic code in a language I am using. This way you can enjoy two benefits simultaneously: your problem solving fu is going up and the mastery of your language of choice is  skyrocketing. 
-The particular problem that pushed me toward path dependent types is called [Omicron](https://codility.com/programmers/challenges/omicron2012) . It has already been "officially" [solved](http://blog.codility.com/2012/03/omicron-2012-codility-programming.html) so you can spare yourself some heavy thinking. The  problem is about efficiently computing Fib(A ** B) % 10000103. It's too slow to use BigInteger arithmetics, so you need to employ [modular arithmetic](http://en.wikipedia.org/wiki/Modular_arithmetic). The official solution does that, but alas! the code is littered with modulo operations
+The particular problem that pushed me toward path dependent types is called [Omicron](https://codility.com/programmers/challenges/omicron2012) . It has already been "officially" [solved](http://blog.codility.com/2012/03/omicron-2012-codility-programming.html) so you can spare yourself some heavy thinking. The  problem is about efficiently computing Fib(A ** B) % 10000103. It's too slow to use BigInteger arithmetics, so you need to employ [modular arithmetic](http://en.wikipedia.org/wiki/Modular_arithmetic). The official solution does that, but, alas, the code is littered with modulo operations
 
 	exp := (N*exp(N, M-1)) mod Q
 
@@ -72,9 +72,9 @@ To summarize, we need to devise a system that lets us:
 Let's stick with the 2nd part for a while. This requirement seems to fit path-dependent typing nicely. We need to make sure that whenever we operate on a modulus it comes from an unique "path", so the compiler can track it for us. This "path"'s got to be represented by some type. Let's call this type Z to mimic mathematical notation (we can say that it represents a finite field for some N)
 ```scala
 case class Z(modulus: Int) {
-    sealed class Modulus {
-      val value = modulus
-    }
+  sealed class Modulus {
+    val value = modulus
+  }
 }
 ```
 	
@@ -104,36 +104,36 @@ In other words, our "integer mod N" is parameterized by the path-dependent Modul
 So how do we mix IntMods with Scala native types? We need to be able to lift any numeric to our IntMod implicitly. Let's make a companion object to help with this.
 ```scala
 object IntMod {
-    implicit def intAsIntModN[N <: Z#Modulus](i: Int) = ???
-    implicit def longAsIntModN[N <: Z#Modulus](i: Long) = ???
+  implicit def intAsIntModN[N <: Z#Modulus](i: Int) = ???
+  implicit def longAsIntModN[N <: Z#Modulus](i: Long) = ???
+
+  implicit def intModN2Long(a: IntMod[_]): Long = a.value
 	
-    implicit def intModN2Long(a: IntMod[_]): Long = a.value
-	
-    implicit def intModN2Int(a: IntMod[_]): Int = a.value.toInt
+  implicit def intModN2Int(a: IntMod[_]): Int = a.value.toInt
 }
 ```
 
 So far so good, but how do we implement the longAsIntModN method? We'll need a value of (correctly-typed) modulus for this. Where can we get one from? Well, let's make it an implicit parameter and take advantage of the fact that type parameters are searched in the process of implicit resolution. In other words, if we introduced a Modulus companion object producing the implicit, it'd be resolved from there.  After these changes our code looks like this:
 ```scala
 case class Z(modulus: Int) {
-    sealed class Modulus {
-	val value = modulus
+  sealed class Modulus {
+    val value = modulus
+  }
+
+  object Modulus {
+    implicit val mod = new Modulus()
+  }
 }
-	
-object Modulus {
-      implicit val mod = new Modulus()
-    }
-}
-	
+
 class IntMod[N <: Z#Modulus] private(val value: Long) extends AnyVal 
 	
 object IntMod {
-    implicit def intAsIntModN[N <: Z#Modulus](i: Int)(implicit modulus: N): IntMod[N] = new IntMod[N](i % modulus.value)
-    implicit def longAsIntModN[N <: Z#Modulus](i: Long)(implicit modulus: N): IntMod[N] = new IntMod[N](i % modulus.value)
+  implicit def intAsIntModN[N <: Z#Modulus](i: Int)(implicit modulus: N): IntMod[N] = new IntMod[N](i % modulus.value)
+  implicit def longAsIntModN[N <: Z#Modulus](i: Long)(implicit modulus: N): IntMod[N] = new IntMod[N](i % modulus.value)
 	
-    implicit def intModN2Long(a: IntMod[_]): Long = a.value
+  implicit def intModN2Long(a: IntMod[_]): Long = a.value
 	
-    implicit def intModN2Int(a: IntMod[_]): Int = a.value.toInt
+  implicit def intModN2Int(a: IntMod[_]): Int = a.value.toInt
 }
 ```
 
@@ -160,13 +160,13 @@ Lookin' good, huh? Actually, we have almost completed our task. What remains is 
 
 ```scala
 class IntMod[N <: Z#Modulus] private(val value: Long) extends AnyVal {
-    def +(x: Long)(implicit m: N): IntMod[N] = value + x
+  def +(x: Long)(implicit m: N): IntMod[N] = value + x
 
-    def -(x: Long)(implicit m: N): IntMod[N] = value - x
+  def -(x: Long)(implicit m: N): IntMod[N] = value - x
 
-    def *(x: Long)(implicit m: N): IntMod[N] = value * x
+  def *(x: Long)(implicit m: N): IntMod[N] = value * x
 	
-    def /(x: IntMod[N])(implicit m: N): IntMod[N] = ??? //left as an exercise to the reader
+  def /(x: IntMod[N])(implicit m: N): IntMod[N] = ??? //left as an exercise to the reader
 }
 ```
 ```scala
