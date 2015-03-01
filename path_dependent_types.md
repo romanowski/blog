@@ -3,7 +3,7 @@
 Let's start with small refreshment of what actually the dependent typing is. Using [Wikipedia](http://en.wikipedia.org/wiki/Dependent_type) as a source:
 >In computer science and logic, a dependent type is a type that depends on a value. 
 
-Neat, huh? But what does it mean in practice? If you take a look at the Wikipedia's [list](http://en.wikipedia.org/wiki/Dependent_type#Comparison_of_languages_with_dependent_types)  of languages that implement dependent typing you might get strange sensation that it is something really obscure and esoteric. Languages mentioned there range from "never heard of" (Guru/Matita anyone?) to "yeah, I recall reading about it on Reddit once or twice" (Coq). Oh wait, there is `F#`. Ooops, sorry, it is not `F#` but [`F*`](http://research.microsoft.com/en-us/projects/fstar/). Thanks goodness it **is** something from Microsoft at least. And look ma', no Haskell.  If it is not implemented in Haskell then truly, what problems can it solve?
+Neat, huh? But what does it mean in practice? If you take a look at the Wikipedia's [list](http://en.wikipedia.org/wiki/Dependent_type#Comparison_of_languages_with_dependent_types)  of languages that implement dependent typing you might get strange sensation that it is something really obscure and esoteric. Languages mentioned there range from "never heard of" (Guru/Matita anyone?) to "yeah, I recall reading about it on Reddit once or twice" (Coq/Idris). Oh wait, there is `F#`. Ooops, sorry, it is not `F#` but [`F*`](http://research.microsoft.com/en-us/projects/fstar/). Thanks goodness it **is** something from Microsoft at least. And look ma', no Haskell.  If it is not implemented in Haskell then truly, what problems can it solve?
 
 Well, actually dependent typing is helpful in solving very down-to-earth problems. I bet that everyone programming in a language with sufficiently expressive type system  has wondered at least once - why my type system does not prevent me from, say, accessing head of empty list? This question is in fact the canonical showcase for dependent typing. Just imagine - if you could somehow encode the length of a list (a value) into its type then it'd be trivial to state that list of length 0 (type that depends on a value, mind you) has no head to be accessed. Standard library would have just been changed to (please bear with my completely made up syntax):
 
@@ -213,3 +213,9 @@ m: IntMod[Q] = IntMod@8cfff0
 scala> m.value
 res0: Long = 9240560
 ```
+
+####Epilogue
+
+I hope I showed you how various flavors of dependent typing can be useful in everyday programming. While we can't [yet](https://github.com/lampepfl/dotty)  enjoy expressiveness of type systems with [full dependent types](http://www.idris-lang.org/), Scala has enough to control type dependencies in amazing ways you'd think are only possible at the run time. If you're wondering what is the precise relation between path-dependent types and dependent types, let me point you to Miles Sabin's thoughtful and detailed [reply](http://stackoverflow.com/questions/12935731/any-reason-why-scala-does-not-explicitly-support-dependent-types/12937819#12937819) to similar question on Stack Overflow
+>Syntactic convenience aside, the combination of singleton types, path-dependent types and implicit values means that Scala has surprisingly good support for dependent typing. 
+In any case, I don't think this (...) can be used as an objection to Scala's status as a dependently typed language. If it is, then the same could be said for Dependent ML (which only allows dependencies on natural number values) which would be a bizarre conclusion.
