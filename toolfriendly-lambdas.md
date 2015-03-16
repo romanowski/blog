@@ -9,17 +9,25 @@ list.map(x => s"Element[%x]"))
 ```
 
 So let's put a breakpoint in our lambda and debug it.
-Breakpoint hit. Great. But wait we are outside of our lambda. Ok, let's start again.
-And again. And again.
-And yeah, we are finally inside our lambda. It is happy case. In some situations our program just end.
+Breakpoint hit. Great. But wait we are outside of our lambda. 
 
-Why?  JDI is line based. And our line holds code for:
+Ok, let's start again.
+
+And again.
+
+And again.
+
+And yeah, we are finally inside our lambda. In happy case. Sometimes our program just end.
+
+## Why?  
+
+JDI is line based. Our line holds code for:
 -create new instance of our lambda
 -create CanBuildFrom for our return type and collection type
 -call of map function
 -invoking our lambda for each element
 
-Pretty much in one line.
+A lot for one line. That is why breapoint it hit multiple times. We cannot blame tooling for this.
 
 ## Solution
 
@@ -27,7 +35,7 @@ So for sake of future debugging rewrite this code to:
 
 ```scala
 list.map(x => 
-    println(x + "_ala"))
+    s"Element[%x]")
 ```
 
 Now breakpoint is hit only once per element.
