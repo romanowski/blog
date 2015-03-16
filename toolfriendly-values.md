@@ -10,7 +10,7 @@ def format(nr: String) = nr.sliding(3).mkString("+48", " ", "")
 val numbers = Seq("+48730409203", "890890886", "700 440 675", "700 45 34 34")
 ```
 
-And lets assume that we have some problems with one of replace. So lets see how our numbers looks after first map. And we can't do it. JVM store return values direcly on stack and JDI has no direct access to stack
+And lets assume that we have some problems with one of replace. So lets see how our numbers looks after first map. And we can't do it. JVM store return values direcly on stack and JDI has no direct access to stack.
 
 Solution? lets name what we get after each transformation. Then debugging or even reading is plasure ;)
 
