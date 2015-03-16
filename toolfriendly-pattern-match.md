@@ -77,7 +77,9 @@ Lets look at case statement in byte code:
 Pretty much to do in one line?
 And assume that we want to check if our case is eg. hitted. So we put a breakpoint in our case line. And what - it is hit everytime condition is checked!
 Why? Checking the condition is also in our line - so tooling get information "I was there".
-<h4>Conclusion:</h4>
+
+## Conclusion:
+
 Let's write cases in this way:
 ```scala
 foo match {
