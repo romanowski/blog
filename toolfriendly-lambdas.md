@@ -1,15 +1,15 @@
 # Lambdas
 
-Lambdas are one of the most loved Scala feature. Until someone have to debug them. Can we blame tooling for this completely?
+Lambdas are one of the most loved Scala feature. Until someone has to debug them. Can we blame tooling for this completely?
 
 
-Standard lambda, I've seen hundres of them:
+Standard lambda, I've seen hundreds of them:
 ```scala
 list.map(x => s"Element[%x]"))
 ```
 
 So let's put a breakpoint in our lambda and debug it.
-Breakpoint hit. Great. But wait we are outside of our lambda. 
+Breakpoint hit. Great. But wait, we are outside of our lambda. 
 
 Ok, let's start again.
 
@@ -17,7 +17,7 @@ And again.
 
 And again.
 
-And yeah, we are finally inside our lambda. In happy case. Sometimes our program just end.
+And yeah, we are finally inside our lambda. In happy case. Sometimes our program just ends.
 
 ## Why?  
 
@@ -27,7 +27,7 @@ JDI is line based. Our line holds code for:
 -call of map function
 -invoking our lambda for each element
 
-A lot for one line. That is why breapoint it hit multiple times. We cannot blame tooling for this.
+A lot for one line. That is why breakpoint it hit multiple times. We cannot blame tooling for this.
 
 ## Solution
 
@@ -40,5 +40,5 @@ list.map(x =>
 
 Now breakpoint is hit only once per element.
 
-Lambdas are not always good pratice. For more:
+Lambdas are not always good practice. For more I recommend Jaime's talk:
 https://www.youtube.com/watch?v=-7iquITRJVo
