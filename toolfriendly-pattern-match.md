@@ -1,6 +1,6 @@
 #1. Cases in pattermaching
 
-Standart Scala code:
+Standard Scala code:
 
 ```scala
 foo match {
@@ -10,7 +10,7 @@ foo match {
 } 
 ```
 
-Nice one - that is why we love Scala
+Nice one - that is why we love Scala.
 
 How tools would like to see the code?
 
@@ -29,8 +29,10 @@ foo match {
 ```
 
 Only difference is line breaking. It is not python so why it matters?
-Tools like code coverage or debuggers usually use JDI. And JDI is line-based - every line of bytecode has its mapping to line in source code.
-Lets look at case statement in byte code:
+Tools like code coverage or debuggers usually use JDI. And JDI is line-based - every line of bytecode has it's mapping to a line in source code.
+
+Let's take a look at case statement in byte code:
+
 ```asm
       18: instanceof    #15                 // class test/Bar
       21: ifeq          51
@@ -74,8 +76,7 @@ Lets look at case statement in byte code:
      109: aload         8
 ```
 
-Pretty much to do in one line?
-And assume that we want to check if our case is eg. hitted. So we put a breakpoint in our case line. And what - it is hit everytime condition is checked!
+Pretty much to do in one line assuming that we want to check if our case is hit. So we put a breakpoint in our case line. And what - it is hit everytime condition is being checked!
 Why? Checking the condition is also in our line - so tooling get information "I was there".
 
 ## Conclusion:
