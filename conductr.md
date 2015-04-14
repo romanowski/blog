@@ -26,7 +26,7 @@ StatusService.signalStartedOrExit()
 as the last part of initialization will do the job perfectly.
 
 ## As an operator...
-X_HERE_GOES_TO_CO_MNIE_URZEKŁO_IN_ENGLISH_X is the simplicity, just two new services:
+What got me mesmerized is the simplicity, just two new services:
 * The first one (```conductr```) does most of the job: given a greedy developer with a dozen of his apps it will patiently receive the bundles from him, replicate them over the cluster and start desired number of instances ensuring proper resource usage distribution at the same time.
 * The second one (```conductr-haproxy```) is a little bridge which works its magic on haproxy, reconfiguring the load-balancer after each change to the cluster. This handy service guarantees that your list of upstream nodes for each endpoint is always up to date. Almost instantly - I was never able to achieve this behavior in my pull-oriented implementations; long live message passing!
 
