@@ -1,8 +1,8 @@
 # ConductR: Typesafe's move in the decade of lightweight containers and age of distributed clusters...
 
-Over last years of being an administrator I've tried multiple well-known and developed few home-grown ways of dealing with applications created in microservices architecture.
-Every time I falled into pitfalls of thes aproaches: the problem of maintaining them in reactive way.
-ConductR is a Typesafe's response to this problem, addressing full lifecycle of an application in a way convenient for both the Developers and Operators.
+During my career as an administrator I've tried multiple well-known and developed few home-grown ways of dealing with applications created in micro-services architecture.
+Every time I felled into pitfalls of these approaches: the problem of maintaining them in reactive way.
+ConductR is a Typesafe's response to this problem, addressing full life cycle of an application in a way convenient for both the Developers and Operators.
 
 ## As a Scala developer...
 ...one gets a nice set of tools: sbt plugins ```sbt-typesafe-conductr``` (which provides control commands for loading, unloading, starting, etc. of application bundles onto the ConductR cluster) and ```sbt-bundle``` (for creating application bundles) and also Scala libraries ```LocationService``` (for service discovery) and ```StatusService``` (for reporting application state).
@@ -11,7 +11,7 @@ Wherever you run an application, either in the production environment or during 
 ```
 val accounts = LocationService.getLookupUrl("/accounts", "http://127.0.0.1:9000/accounts")
 ```
-On ConductR cluster this method call returns proper load balancer URL pointing to requested service, falling back to the provided default value otherwise. If you cannot use this library for any reason, just ask ConductR for it using REST API. Quite simple.
+On ConductR cluster this method call returns proper load balancer URL pointing to requested service, falling back to the provided default value otherwise. If you cannot use this library for any reason, just ask ConductR for it using REST API. Quite simple. 
 
 "Is this application running or starting" problem has been addressed in similar fashion.
 For each node, each application can be in one of following states:
@@ -64,6 +64,6 @@ components = {
   }
 }
 ```
-Yeap, we've deployed multiple versions of this bundle to test zero-downtime application updates.
+Yep, we've deployed multiple versions of this bundle to test zero-downtime application updates.
 After some REST calls, our haproxy directed the traffic to old, both and then only new one - it works perfect.
 
