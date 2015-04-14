@@ -1,7 +1,7 @@
 # ConductR: Typesafe's move in the decade of lightweight containers and age of distributed clusters...
 
 Over last years of being an administrator I've tried multiple well-known and developed few home-grown ways of dealing with applications created in microservices architecture.
-Every time I falled into pitfalls of thes aproaches: the problem of maintaining in them in reactive way.
+Every time I falled into pitfalls of thes aproaches: the problem of maintaining them in reactive way.
 ConductR is a Typesafe's response to this problem, addressing full lifecycle of an application in a way convenient for both the Developers and Operators.
 
 ## As a Scala developer...
