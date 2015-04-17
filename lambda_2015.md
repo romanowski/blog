@@ -1,5 +1,5 @@
 
-#The world after Lambda and React Days 2015
+#The world after LambdaDays and ReactDay 2015
 
 Attending (or, even better, organizing) a conference is one of the best opportunities to predict what the future may bring. Knowing what the future may bring is undoubtedly the most important knowledge for any enterprise - especially when you're in IT. We recognize this at VirtusLab and we've always been trying to be on top of things by being one of the leading sponsors of many conferences and meet-ups. But this would have been an futile exercise if we hadn't asked ourselves in the end:  "What have we learnt?".  Let's try to draw some conclusions then, and try to see what the world is going to be after Lambda Days 2015.
 
