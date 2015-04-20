@@ -5,7 +5,7 @@ Every time I fell into pitfalls of these approaches: the problem of maintaining 
 ConductR is a Typesafe's response to this problem, addressing full life cycle of an application in a way convenient for both the Developers and Operators.
 
 ## As a Scala developer...
-...one gets a nice set of tools: sbt plugins ```sbt-typesafe-conductr``` (which provides control commands for loading, unloading, starting, etc. of application bundles onto the ConductR cluster) and ```sbt-bundle``` (for creating application bundles) and also Scala libraries ```LocationService``` (for service discovery) and ```StatusService``` (for reporting application state).
+...one gets a nice set of tools: sbt plugins ```sbt-conductr``` (which provides control commands for loading, unloading, starting, etc. of application bundles onto the ConductR cluster) and ```sbt-bundle``` (for creating application bundles) and also Scala libraries ```LocationService``` (for service discovery) and ```StatusService``` (for reporting application state).
 
 Wherever you run an application, either in the production environment or during development on local machine your code can behave correctly due to easy-to-use resolving of other bundle services:
 ```
@@ -32,8 +32,8 @@ What got me mesmerized is the simplicity, just two new services:
 
 
 ## As a hacker...
-I'm a man who disassembles his newly bought phone even before turning it on. Given the Debian package of a application server intended to run Scala apps I've installed it on Fedora and deployed simple service written in Go.
-Thanks to ```shazar``` tool provided with ```conduct``` CLI utils, after adding proper manifest to your application, you can bundle it in ConductR-compatible way. The only thing you'll need to do is reporting your own status back to status service. Isn't it a job for CURL?
+I'm a man who disassembles his newly bought phone even before turning it on. Given the Debian package of a application server intended to run Java and Scala apps I've installed it on Fedora and deployed simple service written in Go.
+Thanks to ```shazar``` tool provided with ```conduct``` CLI utils, after adding proper manifest to your application, you can bundle it in ConductR-compatible way. The only thing you'll need to do is reporting your own status back to status service. There's the ConductR supplied ```check``` command, but because of a bit old version of Python in my system (3.4 is required, had 3.2), I've decided to make a small workaround: isn't it a job for CURL?
 ```
 root@debian:~/goxample# cat bundle.conf 
 version    = "1.0.0"
