@@ -1,4 +1,4 @@
-#Path dependent types - modeling algebraic structures has never been easier
+# Path dependent types - modeling algebraic structures has never been easier
 
 Let's start with small refreshment of what actually the dependent typing is. Using [Wikipedia](http://en.wikipedia.org/wiki/Dependent_type) as a source:
 >In computer science and logic, a dependent type is a type that depends on a value. 
@@ -37,7 +37,7 @@ Of course there have been attempts to have this neat "link" in Scala.  Make sure
 
 Would it be possible to overcome these limitations and have a simple value <-> type reasoning in Scala without making your compiler burn tires? Sure there is ...
 
-#####Path dependent types
+##### Path dependent types
 
 You need to know that Scala has a notion of a type dependent on a value. Only that the notion of dependency is not expressed in type signature but rather in type *placement*. Martin Odersky outlined this idea in a co-authored paper [Foundations of Path-Dependent Types](http://lampwww.epfl.ch/~amin/dot/fpdt.pdf) where we read:
 
@@ -60,7 +60,7 @@ a2.b = Some(b1) //does not compile
 
 When you have become enlightened we will be proceeding to the main part of this post. That is, how on earth I used that when solving one of the [Codility](https://codility.com/) [challenges](https://codility.com/programmers/challenges/)?
 
-#####Problem to solve
+##### Problem to solve
 
 When I feel my algorithmic skills are getting rusty, I usually end up checking Codility's web page and finding myself a challenging problem to work on (BTW, I recommend it to everyone - it simply makes you a better programmer). I always try not only to solve a problem, but also to write the most idiomatic code in a language I am using. This way you can enjoy two benefits simultaneously: your problem solving fu is going up and the mastery of your language of choice is  skyrocketing. 
 
@@ -76,7 +76,7 @@ Obviously, you could just make N an implicit and put it in a scope of code doing
 
 Path-dependent typing to the rescue!
 
-#####Solution
+##### Solution
 
 To summarize, we need to devise a system that lets us:
 
@@ -214,8 +214,8 @@ scala> m.value
 res0: Long = 9240560
 ```
 
-####Epilogue
+#### Epilogue
 
 I hope I showed you how various flavors of dependent typing can be useful in everyday programming. While we can't [yet](https://github.com/lampepfl/dotty)  enjoy expressiveness of type systems with [full dependent types](http://www.idris-lang.org/), Scala has enough to control type dependencies in amazing ways you'd think are only possible at the run time. If you're wondering what is the precise relation between path-dependent types and dependent types, let me point you to Miles Sabin's thoughtful and detailed [reply](http://stackoverflow.com/questions/12935731/any-reason-why-scala-does-not-explicitly-support-dependent-types/12937819#12937819) to similar question on Stack Overflow
 >Syntactic convenience aside, the combination of singleton types, path-dependent types and implicit values means that Scala has surprisingly good support for dependent typing. 
-In any case, I don't think this (...) can be used as an objection to Scala's status as a dependently typed language. If it is, then the same could be said for Dependent ML (which only allows dependencies on natural number values) which would be a bizarre conclusion.
+In any case, I don't think this (...) can be used as an objection to Scala's status as a dependently typed language. If it is, then the same could be said for Dependent ML (which only allows dependencies on natural number values) which would be a bizarre conclusion.
