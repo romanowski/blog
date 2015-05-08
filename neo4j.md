@@ -1,7 +1,7 @@
 # Connected and immutable data are better off with Neo4j
 
 [Somewhere, XX-2015]
-Migrating from SQL to Neo4j in a new release of TTT, has helped to add time-independent data management and simplified business logic thanks to better expressiveness of highly-connected data in graph database.
+Migrating from SQL to Neo4j in a new release of TTT, has helped to add time-independent data management,  simplified business logic and open for new connections-in-time features thanks to better expressiveness of highly-connected data in graph database. [bla bla - how much I can say about this project here?]
 
 ## Problem:
 
@@ -38,7 +38,7 @@ The business data presented in storage is expressing graph of connections and ad
 
 ## Indexing and constraints
 
-Some of the drivers for new graph database model were - how are we going to use this data, how are we going to query it, how database can help us to keep it healthy, unique or just quick to find? Neo4j has indexes, that works on data from nodes - they take node label and node property and can be expressed as a pair of unique values - similar to what we know from other databases.
+Some of the drivers for new graph database model were - how are we going to use this data, how are we going to query it, how database can help us to keep it healthy, unique or just quick to find? Neo4j has indexes, that works on data from nodes - they take node label and node property and can be constrained as a pair of unique values - similar to what we know from other databases. There are also "legacy" indexes, a bit lower-level as they need Java API and they are closer in how they work to Lucene engine. Just by using proper indexing scheme on our data, even on small data sets we could reduce query times 10-fold. With newer version of Neo4j, there also comes profiler and explain syntax to see, how possibly the query could be optimised by Neo engine.
 
 ## Delivering new Scala API
 
