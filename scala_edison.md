@@ -3,7 +3,7 @@
 For a long time programming embedded systems with limited hardware resources forced you to use native languages and run your firmware bare-metal. That effectively meant that being a Scala software house and doing embedded weren't an easy job. Fortunately, more and more relatively high-performance platforms have been recently emerging. After playing for some time with Arduino™ ecosystem, we've decided to give Intel® Edison a try - a tiny computer offered by Intel, hosting dual core Intel Atom "Tangier" for main applications, Intel Quark (not-yet-available) core for real-time use and Broadcom Wi-Fi and Bluetooth Low Energy chips. Our goal was to prove that:
 -  you can actually run Scala applications on this platform,
 -  Scala applications can easily be integrated with underlying hardware,
--  you are able to program with reactive paradigm in mind while exploiting low level features like hardware interrupts.
+-  you are able to program with reactive paradigm in mind while exploiting low-level features like hardware interrupts.
 
 We set out by throwing together a simple Scala application that starts blinking an on-board LED diode on pressing a hardware button and turns it off when you click it for the second time. To further validate our claims, we decided not to program asynchronous parts by hand but rather employ Akka to do it for us.
 
