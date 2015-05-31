@@ -2,9 +2,9 @@
 #Interview with Rex Kerr. The first appendix to Dick Wall's 'Scala needs you!'.
 
 ##Preface
-During Scala Days in SF, Dick Wall was [trying to convince people](https://www.parleys.com/tutorial/scala-needs-you) to spend their spare time helping to make Scala language, compiler and documentation even better. He focused mostly on the Scala's web page and available resources which can help newcomers. Also some time ago [Adriaan Moors](https://github.com/adriaanm) completely redesigned readme.md on github having beginners in mind. I wish these resources had been so informative a year ago.
+During Scala Days in SF, Dick Wall was [trying to convince people](https://www.parleys.com/tutorial/scala-needs-you) to spend their spare time helping to make Scala language, compiler and documentation even better. He focused mostly on showing the Scala's web page and available resources which can help newcomers. Also some time ago [Adriaan Moors](https://github.com/adriaanm) completely redesigned readme.md on github having beginners in mind. I wish these resources had been so informative a year ago.
 
-After watching Dick's talk I decided to contact few currently active collaborators and open source contributors from outside EPFL and Typesafe's Scala compiler team. As a result I will publish a short series of interviews focused on Scala language, contributing to Scala ecosystem etc. Also, I think, it's worth to get to know something about these extraordinarily interesting people.
+Having been inspired by Dick's talk I decided to contact a few currently active collaborators and open source contributors from outside EPFL and Typesafe's Scala compiler team. As a result I will publish a short series of interviews focused primarily on Scala language, contributing to Scala ecosystem etc. Not to mention that I believe it's worthwhile to get to know these extraordinarily interesting people.
 
 My first interlocutor was Rex Kerr.
 
