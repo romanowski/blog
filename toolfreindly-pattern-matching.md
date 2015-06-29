@@ -3,7 +3,7 @@ People complain a lot about Scala tooling. People complain a lot about weather. 
 Scala tooling usually has only JVM stack to work with and it was created for Java (especially metadata handling that is vital for tools).
 Tool-friendly code for me is a Scala code that make tools live easier.
 
-I do not want to convince anyone to write Java-like code. I just want to point out some small details that can make your code much more tool-friendly.
+I do not want to convince anyone to write Java-like code. I just would like to point out some small details that can make your code much more tool-friendly.
 In the next blog posts I will show a few codestyle ideas that make your code easier to debug, profile and, surprisingly, understand. Let's start with pattern matching.
 
 ## Tool-friendly pattern matching
@@ -13,8 +13,8 @@ Let's look at standard pattern match snippet:
 
 ```scala
 foo match {
-  case bar@Bar if bar.isOk() => bar.doIt()
-  case baz@Bar if baz.isOk() => baz.doIt()
+  case bar @ Bar if bar.isOk() => bar.doIt()
+  case baz @ Bar if baz.isOk() => baz.doIt()
   case _ => ???
 } 
 ```
@@ -85,7 +85,7 @@ foo match {
 ```
 
 The only difference is line breaking. It is not Python so why does it matter?
-Tools for code coverage or debuggers usually use JDI and JDI is line-based - every line of bytecode has its mapping to a line in the source code.
+Tools for code coverage or debuggers usually use JDI. JDI is line-based - every line of bytecode has its mapping to a line in the source code.
 
 ## Conclusion
 
