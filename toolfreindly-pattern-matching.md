@@ -9,7 +9,7 @@ In the next blog posts I will show a few codestyle ideas that make your code eas
 ## Tool-friendly pattern matching
 Pattern matching is one of the features we love in Scala. Is it tool-friendly?
 
-Let's look at standard pattern match snippet:
+Let's take a look at standard pattern match snippet:
 
 ```scala
 foo match {
