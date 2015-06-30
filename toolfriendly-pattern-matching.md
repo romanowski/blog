@@ -72,11 +72,11 @@ How would tools like to see the code?
 
 ```scala
 foo match {
-  case bar@Bar 
+  case bar @ Bar 
     if bar.isOk() => 
       bar.doIt()
  
-  case baz@Bar 
+  case baz @ Bar 
     if baz.isOk() => 
       baz.doIt()
  
