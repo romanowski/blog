@@ -1,15 +1,13 @@
-People complain a lot about Scala tooling. People complain a lot about weather. Is Scala tooling like weather then? Is it something you cannot do anything about but to accept it or move out to a place with different climate (language)? Luckily, no.
+People complain a lot about Scala tooling. People complain a lot about weather. But is Scala tooling like weather? Something you can’t do anything about except from moving to different climate (language)? Luckily no.
 
-Scala tooling usually has only JVM stack to work with and it was created for Java (especially metadata handling that is vital for tools).
-Tool-friendly code for me is a Scala code that make tools live easier.
+Scala tooling was created for Java (especially metadata handling that is vital for tools) and usually has only the JVM stack to work with. Tool-friendly code for me is Scala code that make tools’ lives easier.
 
-I do not want to convince anyone to write Java-like code. I just would like to point out some small details that can make your code much more tool-friendly.
-In the next blog posts I will show a few codestyle ideas that make your code easier to debug, profile and, surprisingly, understand. Let's start with pattern matching.
+I’m not trying to convince anyone to write java-like code. I just want to to point out some small details that can make your code much more tool-friendly. In forthcoming blog posts I will show a few codestyle ideas that will make your code easier to debug, profile and - surprisingly - understand. Let's start with pattern matching.
 
 ## Tool-friendly pattern matching
 Pattern matching is one of the features we love in Scala. Is it tool-friendly?
 
-Let's take a look at standard pattern match snippet:
+Let's look at a standard pattern match:
 
 ```scala
 foo match {
@@ -19,7 +17,7 @@ foo match {
 } 
 ```
 
-Let's see how the first case statement is compiled into byte code:
+How would tools like to see the code?
 
 ```asm
       18: instanceof    #15                 // class test/Bar
@@ -65,8 +63,7 @@ Let's see how the first case statement is compiled into byte code:
 ```
 
 
-There is a lot going on in the single line. Let's assume that we want to check if our case is hit and we put a breakpoint on the case line. What happens? It is hit every time the condition is being checked!
-Why? Because the condition checking is also on this line - so tooling gets information "I was there".
+There is a lot to do in one line if we assume that we want to check if our case is hit. So, we put a breakpoint in our case line. And what happens? It is hit every time a condition is checked! Why? Checking a condition is also in our line, so tooling gets the information: "I was there".
 
 How would tools like to see the code?
 
@@ -84,12 +81,11 @@ foo match {
 } 
 ```
 
-The only difference is line breaking. It is not Python so why does it matter?
-Tools for code coverage or debuggers usually use JDI. JDI is line-based - every line of bytecode has its mapping to a line in the source code.
+The only difference is line breaking, but this isn’t python so why does it matter? Tools like code coverage or debuggers usually use JDI, which is line-based: every line of the bytecode has its mapping to a line in the source code.
 
 ## Conclusion
 
-Let's write cases this way:
+Let's take a look at a case statement in byte code:
 
 ```scala
 foo match {
@@ -101,4 +97,4 @@ foo match {
 }  
 ```
 
-Then, when we place breakpoint inside a case body, it will be hit only when the body is about to be invoked.
+When we place a breakpoint inside a case body, it will be hit only when the body is about to be invoked.
