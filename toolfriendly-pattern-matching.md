@@ -7,7 +7,7 @@ I’m not trying to convince anyone to write java-like code. I just want to to p
 ## Tool-friendly pattern matching
 Pattern matching is one of the features we love in Scala. Is it tool-friendly?
 
-Let's look at a standard pattern match:
+Let's look at a standard pattern match snippet:
 
 ```scala
 foo match {
@@ -17,7 +17,7 @@ foo match {
 } 
 ```
 
-How would tools like to see the code?
+Let's see how the first case statement is compiled into byte code:
 
 ```asm
       18: instanceof    #15                 // class test/Bar
@@ -63,7 +63,9 @@ How would tools like to see the code?
 ```
 
 
-There is a lot to do in one line if we assume that we want to check if our case is hit. So, we put a breakpoint in our case line. And what happens? It is hit every time a condition is checked! Why? Checking a condition is also in our line, so tooling gets the information: "I was there".
+There is a lot going on in the single line. Let's assume that we want to check if our case is hit and we put a breakpoint on the case line. What happens? It is hit every time the condition is being checked!
+
+Why? Checking a condition is also in our line, so tooling gets the information: "I was there".
 
 How would tools like to see the code?
 
@@ -85,7 +87,7 @@ The only difference is line breaking, but this isn’t python so why does it mat
 
 ## Conclusion
 
-Let's take a look at a case statement in byte code:
+Let's write cases this way:
 
 ```scala
 foo match {
@@ -97,4 +99,4 @@ foo match {
 }  
 ```
 
-When we place a breakpoint inside a case body, it will be hit only when the body is about to be invoked.
+Then, when we place breakpoint inside a case body, it will be hit only when the body is about to be invoked.
