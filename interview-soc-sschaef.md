@@ -1,7 +1,7 @@
 ﻿﻿﻿﻿
 #Interview with Simon Ochsenreither and Simon Schäfer. The second appendix to Dick Wall's 'Scala needs you!'.
 
-In the previous [interview](http://virtuslab.com/blog/interview-with-rex-kerr/) I was discussing with Rex Kerr about his work and contributing to Scala. This time I had a pleasure of asking several questions to two well-known (in the community) Scala ecosystem contributors from Karlsruhe.
+In the previous [interview](http://virtuslab.com/blog/interview-with-rex-kerr/) I was talking with Rex Kerr about his work and contribution to Scala. This time I had a pleasure of asking several questions to two well-known (in the community) Scala ecosystem contributors from Karlsruhe.
 
 >**Simon Ochsenreither** ([soc](https://github.com/soc)) studies computer science and works on various Scala-related things in his free time, including the compiler, the standard library, the documentation and the language specification.
 
@@ -9,7 +9,7 @@ In the previous [interview](http://virtuslab.com/blog/interview-with-rex-kerr/) 
 
 **Michał Pociecha: You're organizers of [The Karlsruhe Functional Programmers Meetup Group](http://www.meetup.com/The-Karlsruhe-Functional-Programmers-Meetup-Group/). Do you see some "pattern" – who is mostly interested in functional programming these days in Germany? Do you use mostly Scala during these meetups? For instance in Kraków we have two separate groups [Kraków Scala User Group](http://www.meetup.com/Krakow-Scala-User-Group/) and [Lambda Lounge Kraków](http://www.meetup.com/Lambda-Lounge-Krakow/). Lambda is focused mostly on more theoretical aspects, and Haskell still seems to be the common language for people using various languages on a daily basis.**
 
-**Simon Schäfer**: To me it seems that functional programming is completely underrepresented in Germany. For most Meetups, there attend only between 10-15 people. Interests are not limited only to Scala though. People are interested in all functional programming languages. Therefore, we have a talk exclusively about Scala every few months. This is not limited to just our region, I think, as I don't know any Scala conferences in Germany – the choice of the technologies used by professional developers here seems to be quite conservative. Most attendees to our Meetups do functional programming as their hobby or only for academia.
+**Simon Schäfer**: To me it seems that functional programming is completely underrepresented in Germany. For most Meetups there are only 10-15 people attending. Interests are not limited only to Scala though. People are interested in all functional programming languages. Therefore, we have a talk exclusively about Scala every few months. This is not limited to just our region, I think, as I don't know any Scala conferences in Germany – the choice of the technologies used by professional developers here seems to be quite conservative. Most attendees to our Meetups do functional programming as their hobby or only for academia.
 
 **Simon Ochsenreither**: I absolutely agree with Simon! German companies seem to be extremely conservative in terms of technology used. Many things are done in Java, followed by a lot of tailor-made software using Microsoft technology. Where I live, there is actually a large company using Delphi.
 
@@ -18,7 +18,7 @@ A lot of this is related to the issue that Germany isn't really a country in whi
 Companies write code to engineer better cars, automate chemical plants or build "machines that build machines" more efficiently.
 Using worse languages doesn't give them a substantial competitive disadvantage, because software isn't what gives them a competitive advantage in the first place.
 
-This sadly affects the quantity of persons at our Meetups, but thankfully not the quality. The attendees as well as our speakers come from a wide variety of backgrounds, and they work on things I would never be smart enough to work on. Most of our attendees are either students, or software developers who use imperative languages at work.
+This sadly affects the quantity of people at our Meetups, but thankfully not the quality. The attendees as well as our speakers come from a wide variety of backgrounds, and they work on things I would never be smart enough to work on. Most of our attendees are either students, or software developers who use imperative languages at work.
 
 I remember one of our first Meetups where our speaker didn't use slides but live-coded for more than an hour – in Agda, an interactive theorem prover!
 In another one I heard the best explanation of continuations and related constructs.
@@ -38,7 +38,7 @@ This really resonated with me back then, and even today we have plenty of "worse
 
 **Simon Schäfer**: Of course I do! My first contact was when I read an article about Scala in a German magazine. When I finished reading it I realized that something happened (others would describe this as love on the first sight). I immediately bought "Programming in Scala", a book by Martin Odersky, and read it within a few days. At that time I didn't understand much – lambdas for example were a complete mystery to me. However, that only increased my interest in the language – an interest that has not shifted away until today. On the other hand, my interest moved a little bit from the language itself to its tooling environment. As you know, which still requires many improvements. What I like about Scala community is that these people really want to improve their technical abilities and to move forward on the way how we develop software. When you think you can't do it better, someone else shows up and blows your mind with something you have never even heard before.
 
-**Michał Pociecha: soc, you're one of the most active Scala compiler contributors, and sschaef, as Typesafe's [Iulian Dragoș](https://github.com/dragos) emphasizes, is the most prolific and active Scala IDE contributor. He had the opportunity to contribute to scalac as well. For sure compilers and IDEs are not the simplest piece of code. You're both students and have contributed to the Scala ecosystem for a few years so it's really impressive. What was your motivation? What did you get in return?**
+**Michał Pociecha: soc, you're one of the most active Scala compiler contributors, and sschaef, as Typesafe's [Iulian Dragoș](https://github.com/dragos) emphasizes, is the most prolific and active Scala IDE contributor. He had the opportunity to contribute to scalac as well. For sure compilers and IDEs are not the simplest pieces of code. You're both students and have contributed to the Scala ecosystem for a few years so it's really impressive. What was your motivation? What did you get in return?**
 
 **Simon Schäfer**: Improving tools is something I seem to be naturally interested in. I spend a lot of time optimizing my own workflow and my toolchain – even if the time, that I have to invest, is relatively huge when you'll compare it with the outcome. Therefore it didn't take me long to start contributing to Scala IDE – there were just too many things that had to be and still need to be improved.
 
@@ -96,7 +96,7 @@ The excellent work of the Scala IDE developers makes me tolerate Eclipse.
 
 I'm also a heavy user of SBT's Eclipse plugin which generates the right Eclipse configuration files so that I don't have to interact with anything in Eclipse except the editor.
 
-**Michał Pociecha: soc, it was the second time when you gave a [talk at ScalaDays](https://www.parleys.com/tutorial/project-valhalla-part-2-value-types-jvm) – this time about Project Valhalla (by the way, it was really interesting talk!). Since you monitor a situation, could you point out the most important changes and how they may affect Scala and its backend?**
+**Michał Pociecha: soc, it was the second time when you gave a [talk at ScalaDays](https://www.parleys.com/tutorial/project-valhalla-part-2-value-types-jvm) – this time about Project Valhalla (by the way, it was really interesting talk!). Since you monitor the situation, could you point out the most important changes and how they may affect Scala and its backend?**
 
 **Simon Ochsenreither**: Project Valhalla is an experimental project led by Oracle which investigates adding support for value types and specialized Generics to the JVM.
 Value types can be described as user-definable classes which act like primitives. Specialized Generics means that primitive types and value types will be supported in Generics and benefit from code which is optimized for these types, instead of boxing them to reference types.
@@ -124,6 +124,6 @@ If everything works out, I think users will not have to worry about it. Just lik
 **Simon Ochsenreither**: I'm an avid runner, I love cooking and meeting friends. Family is really important to me, they always have my back and support me.
 It's hard to balance everything when you have a lot to do, but I work on it. :-)
 
-**Simon Schäfer**: I'm a martial artist. I used to train a lot when I was younger but nowadays, I fear, I spend more time training my brain than my muscles. Unfortunately it seems to be less healthy (well, at least for the most of the time). Given that contributing to the Scala ecosystem is what I do in my free time, there is not so much time left to spend it on other things. And if I have some more spare time, well, I think about how to program. ;)
+**Simon Schäfer**: I'm a martial artist. I used to train a lot when I was younger but nowadays, I'm afraid, I spend more time training my brain than my muscles. Unfortunately it seems to be less healthy (well, at least for the most of the time). Given that contributing to the Scala ecosystem is what I do in my free time, there is not so much time left to spend it on other things. And if I have some more spare time, well, I think about how to program. ;)
 
 **Michał Pociecha: Thanks a lot, guys!**
