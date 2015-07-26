@@ -96,7 +96,7 @@ The excellent work of the Scala IDE developers makes me tolerate Eclipse.
 
 I'm also a heavy user of SBT's Eclipse plugin which generates the right Eclipse configuration files so that I don't have to interact with anything in Eclipse except the editor.
 
-**Michał Pociecha: soc, it was the second time that you gave a [talk at ScalaDays](https://www.parleys.com/tutorial/project-valhalla-part-2-value-types-jvm) – this time about Project Valhalla (by the way, it was really interesting talk!). Since you monitor the situation, could you point out the most important changes and how they may affect Scala and its backend?**
+**Michał Pociecha: soc, during your second [talk at ScalaDays](https://www.parleys.com/tutorial/project-valhalla-part-2-value-types-jvm) you spoke about Project Valhalla (by the way, it was really interesting talk!). Since you monitor the situation, could you point out the most important changes and how they may affect Scala and its backend?**
 
 **Simon Ochsenreither**: Project Valhalla is an experimental project led by Oracle which investigates adding support for value types and specialized Generics to the JVM.
 Value types can be described as user-definable classes which act like primitives. Specialized Generics means that primitive types and value types will be supported in Generics and benefit from code which is optimized for these types, instead of boxing them to reference types.
