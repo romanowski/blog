@@ -337,7 +337,7 @@ private[this] final val singleton_<:< = new <:<[Any,Any] { def apply(x: Any): An
 implicit def $conforms[A]: A <:< A = singleton_<:<.asInstanceOf[A <:< A]
 ```
 
-_IntWrapper_ inherits from _Ordered[IntWrapper]_ (which in turn extends _Any with java.lang.Comparable[IntWrapper]_) and _Function1_ is covariant in it's return type so _IntWrapper => IntWrapper_ is actually subtype of _IntWrapper => Comparable[IntWrapper]_ and types matches. In fact we are passing to _Ordering.ordered_ identity function.
+_IntWrapper_ inherits from _Ordered[IntWrapper]_ (which in turn extends _Any with java.lang.Comparable[IntWrapper]_) and _Function1_ is covariant in it's return type so _IntWrapper => IntWrapper_ is actually subtype of _IntWrapper => Comparable[IntWrapper]_ and types match. In fact we are passing to _Ordering.ordered_ identity function.
 
 Last thing worth to notice here is implementation of _Ordering.ordered_. It always creates new object which is nice to be aware of:
 
