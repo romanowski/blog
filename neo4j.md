@@ -1,6 +1,6 @@
 # Highly connected data are better off with Neo4j
 
-Replacing SQL by Neo4j in a new release of project management tool "Facets" simplifies business logic, adds time-dependent data management, and gives room for new features like connections-in-time thanks to a better expressiveness and ease of visualization of highly-connected data in a graph database.
+Replacing SQL by Neo4j in a new release of project management tool simplifies business logic, adds time-dependent data management, and gives room for new features like connections-in-time thanks to a better expressiveness and ease of visualization of highly-connected data in a graph database.
 
 ## Problem:
 
