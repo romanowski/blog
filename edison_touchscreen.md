@@ -1,6 +1,6 @@
 # Hacking platform drivers into Intel Edison
 
-Unlike most of the development boards, Intel Edison uses binary, propreitary blob for delivering tables of devices connected to I2C and SPI buses. They're loaded via Simple Firmware Interface (SFI) during kernel startup  in Intel MID SFI initialization code (located in intel_mid_sfi.c) and compared to board data structure (board.c). 
+Unlike most of the development boards, Intel Edison uses binary, proprietary blob for delivering tables of devices connected to I2C and SPI buses. They're loaded via Simple Firmware Interface (SFI) during kernel startup  in Intel MID SFI initialization code (located in intel_mid_sfi.c) and compared to board data structure (board.c). 
 
 "To summarise, in the need of add new devices the SFI Tables is not an option because there isn't any available tool so far to edit or modify such tables and seems like IFWI source is not going to be available to user.  So the best option is to do all the hacks in kernel and add the devices there and remove possible conflicting devices from board.c file." , quoting [icpda](https://communities.intel.com/message/278282#278282), user of an official Intel support forum.
 
