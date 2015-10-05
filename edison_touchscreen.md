@@ -8,7 +8,7 @@ So, we need to hack a kernel? It's much easier than hacking ourselves back in ti
 
 ## Adding platform data into device libs
 
-To begin with, we'll create appropriate entries in `linux/arch/x86/platform/intel-mid/device_libs`.
+To begin with, we'll create appropriate entries in [`linux/arch/x86/platform/intel-mid/device_libs`](https://github.com/01org/edison-linux/tree/edison-3.10.17/arch/x86/platform/intel-mid/device_libs).
 
 ```c
 /*
@@ -55,7 +55,7 @@ static struct devs_id tsc2007dl_devs_id = { // <-- Just a SFI boilerplate, keep 
 ```
 The `platform_tsc2007.c` will be included in the patch at the bottom of this post.
 
-OK, now we'll need to add it into `struct devs_id device_ids[]` in `board.c`:
+OK, now we'll need to add it into `struct devs_id device_ids[]` in [`board.c`](https://github.com/01org/edison-linux/blob/edison-3.10.17/arch/x86/platform/intel-mid/board.c):
 ```c
 #if defined(CONFIG_TOUCHSCREEN_TSC2007)
         {"tsc2007", SFI_DEV_TYPE_I2C, 1, &tsc2007dl_platform_data, NULL}, // but don't ask me what is that magic number in the middle argument
@@ -64,7 +64,7 @@ OK, now we'll need to add it into `struct devs_id device_ids[]` in `board.c`:
 
 ##Loading our very own SFI entries
 
-Let's take a look at `static int sfi_parse_devs(struct sfi_table_header *table)` in `intel_mid_sfi.c`:
+Let's take a look at `static int sfi_parse_devs(struct sfi_table_header *table)` in [`intel_mid_sfi.c`](https://github.com/01org/edison-linux/blob/edison-3.10.17/arch/x86/platform/intel-mid/intel_mid_sfi.c):
 ```c
 (...)
                 if (dev->device_handler) {
