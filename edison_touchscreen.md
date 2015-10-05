@@ -1,14 +1,14 @@
 # Hacking platform drivers into Intel Edison
 
-Unlike most of development boards, Intel Edison uses binary, properitary blob for delivering tables of devices connected to I2C and SPI buses. They're loaded via Simple Firmware Interface (SFI), during kernel startup  in Intel MID SFI initialization code (located in intel_mid_sfi.c) and compared to board data structure (board.c). 
+Unlike most of the development boards, Intel Edison uses binary, propreitary blob for delivering tables of devices connected to I2C and SPI buses. They're loaded via Simple Firmware Interface (SFI) during kernel startup  in Intel MID SFI initialization code (located in intel_mid_sfi.c) and compared to board data structure (board.c). 
 
-"To summarise, in the need of add new devices the SFI Tables is not an option because there isn't any available tool so far to edit or modify such tables and seems like IFWI source is not going to be available to user.  So the best option is to do all the hacks in kernel and add the devices there and remove possible conflicting devices from board.c file." , quoting [icpda](https://communities.intel.com/message/278282#278282), user of an on official Intel support forum.
+"To summarise, in the need of add new devices the SFI Tables is not an option because there isn't any available tool so far to edit or modify such tables and seems like IFWI source is not going to be available to user.  So the best option is to do all the hacks in kernel and add the devices there and remove possible conflicting devices from board.c file." , quoting [icpda](https://communities.intel.com/message/278282#278282), user of an official Intel support forum.
 
-So, we need to hack a kernel? It's much easier than hacking ourselfs back in time, so let's do it! I'll add TSC2007, a 4-wire resistive touch panel driver connected over I2C, basing on [jbayalas](https://communities.intel.com/message/312395#312395) post in the same thread.
+So, we need to hack a kernel? It's much easier than hacking ourselves back in time, so let's do it! I'll add TSC2007, a 4-wire resistive touch panel driver connected over I2C, based on [jbayalas](https://communities.intel.com/message/312395#312395) post in the same thread.
 
 ## Adding platform data into device libs
 
-To begin with, we'll create appriopriate entries in `linux/arch/x86/platform/intel-mid/device_libs`.
+To begin with, we'll create appropriate entries in `linux/arch/x86/platform/intel-mid/device_libs`.
 
 ```c
 /*
@@ -53,7 +53,7 @@ static struct devs_id tsc2007dl_devs_id = { // <-- Just a SFI boilerplate, keep 
 
 #endif
 ```
-The `platform_tsc2007.c` will be included in patch at the bottom of this post.
+The `platform_tsc2007.c` will be included in the patch at the bottom of this post.
 
 OK, now we'll need to add it into `struct devs_id device_ids[]` in `board.c`:
 ```c
@@ -93,7 +93,7 @@ Let's take a look at `static int sfi_parse_devs(struct sfi_table_header *table)`
 (...)
 // where dev is devs_id entry with corresponding name
 ```
-We can't use `sfi_parse_devs` without generating own SFI OEMB table, so let's just "handle" our entry separately, by calling `sfi_handle_i2c_dev` directly in `int intel_mid_platform_init(void)`:
+We can't use `sfi_parse_devs` without generating own SFI OEMB table, so let's just "handle" our entry separately by calling `sfi_handle_i2c_dev` directly in `int intel_mid_platform_init(void)`:
 ```c
 static int __init intel_mid_platform_init(void)
 {
