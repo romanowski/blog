@@ -170,7 +170,7 @@ Wikipedia does not mention it but there is another commonly used combinator call
 A s t &&& A s u -> A s (t, u).
  
 I find it really helpful to visualize arrow combinators: 
-![](/home/rzeznik/blog/blog/kleisli_combinators.png)
+![](http://virtuslab.com/wp-content/uploads/2015/10/kleisli_combinators.png)
 
 Looking closely at the definitions we are able to coin arrow interface in form of trait. 
 
@@ -244,7 +244,7 @@ I chose to replace `combine` with something more tailored to functions (and also
 ### Rewrite code using arrows
 Now that we have extended functions with arrow combinators, we can use them in our service to make it composable. Let's sketch business logic flow to analyze how it can be done:
 
-![](/home/rzeznik/blog/blog/kleisli_flow.png) 
+![](http://virtuslab.com/wp-content/uploads/2015/10/kleisli_flow.png) 
 
 Looks good. Translating this flow back to code gives us very generic function that can be used to implement all the buisness logic we have:
 
@@ -500,7 +500,7 @@ Now we are finally able to incorporate error handling into our flow
 
 Let's go back to the drawing board. The flow can be much simplified because we won't be relying on side effects to propagate errors. What's more, handling of errors will be responsibility of an `Either` monad, so we do not have to write any code or alter the logic to take care of this. Thus, we can enjoy smooth linear flow. A railway, if you will. Hence the term railway oriented programming, coined by Scott Wlashin.
 
-![](/home/rzeznik/blog/blog/kleisli_railway.png) 
+![](http://virtuslab.com/wp-content/uploads/2015/10/kleisli_railway.png) 
 
 Red lines represent 'error handling track'. Their presence is caused by how we implemented `bind` in the `Either` monad ie. binding is _right biased_. When `Left` value is encountered, it breaks the flow. Bold blue lines represent _Kleisli composition_, they combine _monadic values_ together by unpacking them and feeding the next computation. One problem you might have noticed is the copying function represented by the dotted rectangle. It is not monadic and as such cannot participate in the normal flow. 
 
