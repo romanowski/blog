@@ -1,16 +1,16 @@
 # Arrows, Monads and Kleisli - part I
 
-During Scala Days Amsterdam I came across a concept of [arrow](https://www.parleys.com/tutorial/functional-programming-arrows). It was called a *general interface to computation* and it looked like a technique that could bridge code that is imperative in nature with proper functional programming.  Later on I read about [Railway Oriented Programming](http://fsharpforfunandprofit.com/rop/) and found it really neat. I was compelled to reinvent the wheel and check all this in practice. I dug up some old business logic Scala code, that could really be Java code with slightly different keywords, and tried to refactor it using all I'd learned about arrows. BTW, you can find code used in this blog post on Github TODO: link here. In this post I'll work with this code from the ground up and try to demonstrate curious things you can do with arrows. You can go through the examples by following commits in the GitHub repo. 
-Because no one in their sane mind likes to read "War and Peace"-sized posts, I decided to break it up into parts. In the first part I'll explain arrows and Kleisli arrows, trying to show how they can help to express business logic in terms of data flow.  In the next parts I'll get into more complicated examples, try to overcome various Scala type-system deficiencies and, finally, introduce arrow transformers.
+During Scala Days Amsterdam I came across a concept of [arrow](https://www.parleys.com/tutorial/functional-programming-arrows). It was called a *general interface to computation* and it looked like a technique that could bridge code that is imperative in nature with proper functional programming. Later on I read about [Railway Oriented Programming](http://fsharpforfunandprofit.com/rop/) and found it really neat. I was compelled to reinvent the wheel and check all this in practice. I dug up some old business logic Scala code, that could really be Java code with slightly different keywords, and tried to refactor it using all I'd learned about arrows. BTW, you can find code used in this blog post on Github TODO: link here. In this post I'll work with this code from the ground up and try to demonstrate curious things you can do with arrows. You can go through the examples by following commits in the GitHub repo. 
+Because no one in their sane mind likes to read "War and Peace"-sized posts, I decided to break it up into parts. In the first part I'll explain arrows and Kleisli arrows, trying to show how they can help to express business logic in terms of data flow. In the next parts I'll get into more complicated examples, try to overcome various Scala type-system deficiencies and, finally, introduce arrow transformers.
 
 ##### What's an arrow?
-In simple words arrow is a generalization of function eg. it is an abstraction of things that behave like functions. [Wikipedia](https://en.wikipedia.org/wiki/Arrow_%28computer_science%29) says:
+In simple words arrow is a generalization of function i.e. it is an abstraction of things that behave like functions. [Wikipedia](https://en.wikipedia.org/wiki/Arrow_%28computer_science%29) says:
 >Arrows are a type class used in programming to describe computations in a pure and declarative fashion. First proposed by computer scientist John Hughes as a generalization of monads, arrows provide a referentially transparent way of expressing relationships between logical steps in a computation. Unlike monads, arrows don't limit steps to having one and only one input.
 
 [Haskell wiki](https://wiki.haskell.org/Arrow_tutorial):
 >Arrow a b c represents a process that takes as input something of type b and outputs something of type c. 
 
-You can treat arrow as a function type that gives you more combinators to work with than function's `compose` or `andThen`. Composing arrows is not only more expressive but can encapsulate rich semantics eg. you can compose monadic processes.
+You can treat arrow as a function type that gives you more combinators to work with than function's `compose` or `andThen`. Composing arrows is not only more expressive but can encapsulate rich semantics e.g. you can compose monadic processes.
 
 ### Let's get the party started
 Let's imagine we have legacy code pulled out of production tracking system. In this system things that are being tracked are modeled by a domain object called `ProductionLot` (simplified):
@@ -187,7 +187,7 @@ trait Arrow[=>:[_, _]] {
   def second[A, B, C](f: A =>: B): (C, A) =>: (C, B)
 
   def merge[A, B, C, D](f: A =>: B, g: C =>: D): (A, C) =>: (B, D) = compose(first(f), second(g))
-  def split[A, B, C](fab: A =>: B, fac: A =>: C): A =>: (B, C) = compose(combine(fab, fac), arr((x: A) => (x, x)))
+  def split[A, B, C](fab: A =>: B, fac: A =>: C): A =>: (B, C) = compose(merge(fab, fac), arr((x: A) => (x, x)))
 }
 ```
 
@@ -351,6 +351,7 @@ class ProductionLotsService(productionLotsRepository: ProductionLotsRepository) 
 
   private def verifyWorkerCanBeAssignedToProductionLot(productionLot: ProductionLot, workerId: Long): Either[Error, ProductionLot] =
     Either.cond(productionLot.workerId.isEmpty, productionLot, WorkerAlreadyAssignedError(productionLot))
+}
 
 class ProductionLotsRepository {
   def findExistingById(productionLotId: Long): Either[Error, ProductionLot] =
