@@ -1,6 +1,7 @@
 # Arrows, Monads and Kleisli - part I
 
-During Amsterdam Scala Days I came across a concept of [arrow](https://www.parleys.com/tutorial/functional-programming-arrows). It was called a *general interface to computation* and it looked like a technique that could bridge code that is imperative in nature with proper functional programming.  Later on I read about [Railway Oriented Programming](http://fsharpforfunandprofit.com/rop/) and found it really neat. I was compelled to reinvent the wheel and check all this in practice. I dug up some old business logic Scala code that could really be Java code with slightly different keywords and tried to refactor it using all I'd learned about arrows. BTW, you can find code used in this blog post on Github TODO: link here. In this post I'll work with this code from the ground up and try to demonstrate curious things you can do with arrows. You can go through the examples by following commits in the GitHub repo. 
+During Scala Days Amsterdam I came across a concept of [arrow](https://www.parleys.com/tutorial/functional-programming-arrows). It was called a *general interface to computation* and it looked like a technique that could bridge code that is imperative in nature with proper functional programming.  Later on I read about [Railway Oriented Programming](http://fsharpforfunandprofit.com/rop/) and found it really neat. I was compelled to reinvent the wheel and check all this in practice. I dug up some old business logic Scala code, that could really be Java code with slightly different keywords, and tried to refactor it using all I'd learned about arrows. BTW, you can find code used in this blog post on Github TODO: link here. In this post I'll work with this code from the ground up and try to demonstrate curious things you can do with arrows. You can go through the examples by following commits in the GitHub repo. 
+Because no one in their sane mind likes to read "War and Peace"-sized posts, I decided to break it up into parts. In the first part I'll explain arrows and Kleisli arrows, trying to show how they can help to express business logic in terms of data flow.  In the next parts I'll get into more complicated examples, try to overcome various Scala type-system deficiencies and, finally, introduce arrow transformers.
 
 ##### What's an arrow?
 In simple words arrow is a generalization of function eg. it is an abstraction of things that behave like functions. [Wikipedia](https://en.wikipedia.org/wiki/Arrow_%28computer_science%29) says:
@@ -38,7 +39,7 @@ class ProductionLotsRepository {
 }
 ```
 
-Business logic governing operations on production lots lies in, as you can imagine, `ProductionLotsService`. Let's say you can perform three operations in this system. You can start production of a production lot, revoke production lot status and reassign production lot to a different worker. Obviously these operations need to perform some kind of validations (eg. you cannot reassign production lot to the same worker it already has), interact with db etc.
+Business logic governing operations on production lots lies in, as you can imagine, `ProductionLotsService`. Let's say you can perform three operations in this system. You can start production of a production lot, revoke production lot (change its current status and clear other properties) and reassign production lot to a different worker. Obviously these operations need to perform some kind of validations (eg. you cannot reassign production lot to the same worker it already has), interact with db etc.
 
 TODO: link to GitHub
 ```scala
@@ -116,12 +117,12 @@ TODO link to GitHub
       status = ProductionLotStatus.InProduction
     )
 
-    val startProductionLotF = productionLotsRepository.findExistingById _ andThen
+    val startProductionOfF = productionLotsRepository.findExistingById _ andThen
       verify andThen
       copy andThen
       productionLotsRepository.save
 
-    startProductionLotF(productionLotId)
+    startProductionOfF(productionLotId)
   }
 
   def changeAssignedWorker(productionLotId: Long, newWorkerId: Long): Unit = {
@@ -155,7 +156,7 @@ arr (s -> t)        ->   A s t
 first (A s t)       ->   A (s,u) (t,u)
 
 (Scalaz also defines `second` as a complementary function to first. 
-second (A s t) -> A (u, s) (u, t))
+second (A s t) -> A (u, s) (u, t)). Please note that there is no need whatsoever to restrict type of "unaltered portion".  This is to make `first` and `second` operators fit into any computation, regardless of its result type.  Hence the introduction of the third, independent, type parameter. 
 
 > A composition operator >>> that can attach a second arrow to a first as long as the first function's output and the second's input have matching types
 
@@ -172,7 +173,7 @@ A s t &&& A s u -> A s (t, u).
 I find it really helpful to visualize arrow combinators: 
 ![](http://virtuslab.com/wp-content/uploads/2015/10/kleisli_combinators.png)
 
-Looking closely at the definitions we are able to coin arrow interface in form of trait. 
+Looking closely at the definitions we are able to coin arrow interface in form of a trait. 
 
 TODO: link to GitHub
 ```scala
@@ -185,13 +186,13 @@ trait Arrow[=>:[_, _]] {
   def first[A, B, C](f: A =>: B): (A, C) =>: (B, C)
   def second[A, B, C](f: A =>: B): (C, A) =>: (C, B)
 
-  def combine[A, B, C, D](f: A =>: B, g: C =>: D): (A, C) =>: (B, D) = compose(first(f), second(g))
+  def merge[A, B, C, D](f: A =>: B, g: C =>: D): (A, C) =>: (B, D) = compose(first(f), second(g))
   def split[A, B, C](fab: A =>: B, fac: A =>: C): A =>: (B, C) = compose(combine(fab, fac), arr((x: A) => (x, x)))
 }
 ```
 
-I followed Scalaz convention closely here: an `id` method is added that returns identity arrow (it will come handy later on), `compose` is reversed to resemble function composition (we'll be calling it `<<<`, instead of `>>>`) and `merge` is renamed to `combine`. 
-As you probably noticed from the diagram `merge`/`combine` can be implemented as a composition of `first` and `second`. Further conclusion that can be drawn from this is that `f &&& g = arr(x -> (x, x)) >>> (f *** g)`. 
+I followed Scalaz convention closely here: an `id` method is added that returns identity arrow (it will come handy later on) and `compose` is reversed to resemble function composition (we'll be calling it `<<<`, instead of `>>>`). 
+As you probably noticed from the diagram `merge` can be implemented as a composition of `first` and `second`. Further conclusion that can be drawn from this is that `f &&& g = arr(x -> (x, x)) >>> (f *** g)`. 
 You might be curious about the naming of `Arrow` type parameter. It is called `=>:` to mimic function type's `=>`. It reflects that arrow is a generalization of function and enhances function-like types, that is, anything that takes input and produces output. It builds on a less-known Scala feature that let's you write higher-order type constructor in infix form eg. `=>[A, B]` is  `A => B`.
 Next, we'd like to enhance arrow-like classes with fancy symbolic arrow combinators we all love :-) Following Scalaz convention, we'll wrap these in the `ArrowOps` class and provide appropriate implicit conversions.
 
@@ -201,7 +202,7 @@ final class ArrowOps[=>:[_, _], A, B](val self: A =>: B)(implicit val arr: Arrow
 
   def <<<[C](fca: C =>: A): C =>: B = arr.compose(self, fca)
 
-  def ***[C, D](g: C =>: D): (A, C) =>: (B, D) = arr.combine(self, g)
+  def ***[C, D](g: C =>: D): (A, C) =>: (B, D) = arr.merge(self, g)
 
   def &&&[C](fac: A =>: C): A =>: (B, C) = arr.split(self, fac)
 }
@@ -224,22 +225,23 @@ Mapping between functions and arrows is straightforward:
 TODO: link to GitHub
 ```scala
 trait ArrowInstances {
+  // function is arrow
   implicit object FunctionArrow extends Arrow[Function1] {
-    override def arr[A, B](f: (A) => B): A => B = f
+    override def id[A]: A => A = identity[A]
 
-    override def second[A, B, C](f: A => B): ((C, A)) => (C, B) = prod => (prod._1, f(prod._2))
+    override def arr[A, B](f: (A) => B): A => B = f
 
     override def compose[A, B, C](fbc: B => C, fab: A => B): A => C = fbc compose fab
 
     override def first[A, B, C](f: A => B): ((A, C)) => (B, C) = prod => (f(prod._1), prod._2)
 
-    override def id[A]: A => A = identity[A]
+    override def second[A, B, C](f: A => B): ((C, A)) => (C, B) = prod => (prod._1, f(prod._2))
 
-    override def combine[A, B, C, D](f: (A) => B, g: (C) => D): ((A, C)) => (B, D) = { case (x, y) => (f(x), g(y)) }
+    override def merge[A, B, C, D](f: (A) => B, g: (C) => D): ((A, C)) => (B, D) = { case (x, y) => (f(x), g(y)) }
   }
 }
 ```
-I chose to replace `combine` with something more tailored to functions (and also slightly faster) but we could live with the default one.
+I chose to replace `merge` with something more tailored to functions (and also slightly faster) but we could live with the default one.
 
 ### Rewrite code using arrows
 Now that we have extended functions with arrow combinators, we can use them in our service to make it composable. Let's sketch business logic flow to analyze how it can be done:
@@ -260,7 +262,7 @@ TODO: link to GitHub
     )
 ```
 
-We can customize it behavior by plugging in various functions. For example:
+We can customize its behavior by plugging in various functions. For example:
 
 ```scala
   private val changeWorkerA = productionLotArrow[Long] (verifyWorkerChange, (pl, id) => pl.copy(workerId = Some(id)))
@@ -284,7 +286,7 @@ We can customize it behavior by plugging in various functions. For example:
     revokeToA(productionLotId, productionLotStatus)
 ```
 
-Starting production seems to be a little harder because of multiple arguments involved. We need to form environment by encapsulating them in a case class:
+Starting production seems to be a little harder because of multiple arguments involved. But when you think about it, each function with multiple arguments can be changed to a `Function1` using case class encapsulation:
 
 ```scala
   private case class StartProduction(productionStartDate: Date, workerId: Long)
@@ -331,8 +333,8 @@ TODO link to GitHub
 ```scala
 sealed abstract class Error(val message: String)
 
-case class ProductionLotNotFound(id: Long) extends Error(s"ProductionLot $id does not exist")
-case class ProductionLotClosed(pl: ProductionLot) extends Error(s"Attempt to operate on finished ProductionLot $pl")
+case class ProductionLotNotFoundError(id: Long) extends Error(s"ProductionLot $id does not exist")
+case class ProductionLotClosedError(pl: ProductionLot) extends Error(s"Attempt to operate on finished ProductionLot $pl")
 //...
 ```
 
@@ -340,20 +342,19 @@ case class ProductionLotClosed(pl: ProductionLot) extends Error(s"Attempt to ope
 class ProductionLotsService(productionLotsRepository: ProductionLotsRepository) {
 //...
   private def verifyProductionLotNotDone(productionLot: ProductionLot): Either[Error, ProductionLot] =
-    Either.cond(productionLot.status != ProductionLotStatus.Done, productionLot, ProductionLotClosed(productionLot))
+    Either.cond(productionLot.status != ProductionLotStatus.Done, productionLot, ProductionLotClosedError(productionLot))
 
   private def verifyWorkerChange(productionLot: ProductionLot, newWorkerId: Long): Either[Error, ProductionLot] =
     productionLot.workerId.fold[Either[Error, ProductionLot]](
-      Left(NoWorker(productionLot)))(
-        workerId => Either.cond(workerId != newWorkerId, productionLot, SameWorker(productionLot)))
+      Left(NoWorkerError(productionLot)))(
+        workerId => Either.cond(workerId != newWorkerId, productionLot, SameWorkerError(productionLot)))
 
   private def verifyWorkerCanBeAssignedToProductionLot(productionLot: ProductionLot, workerId: Long): Either[Error, ProductionLot] =
-    Either.cond(productionLot.workerId.isEmpty, productionLot, WorkerAlreadyAssigned(productionLot))
-}
+    Either.cond(productionLot.workerId.isEmpty, productionLot, WorkerAlreadyAssignedError(productionLot))
 
 class ProductionLotsRepository {
   def findExistingById(productionLotId: Long): Either[Error, ProductionLot] =
-    findById(productionLotId).toRight(ProductionLotNotFound(productionLotId))
+    findById(productionLotId).toRight(ProductionLotNotFoundError(productionLotId))
 
   def findById(productionLotId: Long): Option[ProductionLot] = ???
 
@@ -361,16 +362,17 @@ class ProductionLotsRepository {
 }
 ```
 
-But we immediately notice a problem - our shiny arrow stops compiling! If you tried to fix it, it'd become clear that there is no easy way to compose these functions! Every function'd have to unpack a value from `Either` and pack result back into a new instance of `Either`. Resulting code would be horrible mess with a lot of boilerplate. Things look bleak. Seems we're in worse shape than before...
-Fear not. As we said arrows are a general interface to computation. This implies that many different computation types can be expressed using arrows. Do not forget that arrow does not impose restrictions on underlying type as long you can come up with implementations of abstract operations that arrow typeclass needs ie. `first`/`second` and `compose`. While ordinary `A => B` functions are clearly not sufficient to express our new idea, there exists another abstraction designed to do that. It is called `Kleisli` to honor [Swiss mathematician](https://en.wikipedia.org/wiki/Heinrich_Kleisli) who studied properties of categories associated to monads. Going back to our Scala domain `Kleisli` represents _monadic_ computations ie. functions of type `A => M[B]`. We'll be able to implement arrow on `Kleisli`, creating so called Kleisli arrows ie. arrows that can compose functions of type `A => M[B]` as long as `M` is a monad.
+But we immediately notice a problem - our shiny arrow stops compiling! If you tried to fix it, it'd become clear that there is no easy way to compose these functions! Every function would have to unpack a value from `Either` and pack result back into a new instance of `Either`. Resulting code would be horrible mess with a lot of boilerplate. Things look bleak. Seems we're in worse shape than before...
+Fear not. As we said arrows are a general interface to computation. This implies that many different computation types can be expressed using arrows. Do not forget that arrow does not impose restrictions on underlying type as long you can come up with implementations of abstract operations that arrow typeclass needs ie. `first`/`second` and `compose`. While ordinary `A => B` functions are clearly not sufficient to express our new idea, there exists another abstraction designed to do that. It is called `Kleisli` to honor [Swiss mathematician](https://en.wikipedia.org/wiki/Heinrich_Kleisli) who studied properties of categories associated to monads. Going back to our Scala domain `Kleisli` represents _monadic_ computations i.e. functions of type `A => M[B]`. We'll be able to implement arrow on `Kleisli`, creating so called Kleisli arrows ie. arrows that can compose functions of type `A => M[B]` as long as `M` is a monad.
 
 ##### What's a monad?
-Monad is bread and butter of functional programming. I'm not going to explain the concept in this blog post. It'd probably take quite a few (posts - pun intended) to just skim through theory and practice of monads. For our purposes it suffices to know that monad is a container with two operations: `bind` and `return` (sometimes called `unit` but we'll be calling it `point` to keep things faimilar for Scalaz people). This operations have the following semantics (from [wiki](https://en.wikipedia.org/wiki/Monad_%28functional_programming%29)):
+Monad is bread and butter of functional programming. I'm not going to explain the concept in this blog post. It'd probably take quite a few (posts - pun intended) to just skim through theory and practice of monads. For our purposes it suffices to know that monad is a container with two operations: `bind` and `return` (sometimes called `unit` but we'll be calling it `point` to keep things faimilar for Scalaz people). These operations have the following semantics (from [wiki](https://en.wikipedia.org/wiki/Monad_%28functional_programming%29)):
 
 >    The return operation takes a value from a plain type and puts it into a monadic container using the constructor, creating a monadic value.
 >    The bind operation takes as its arguments a monadic value and a function from a plain type to a monadic value, and returns a new monadic value.
 
-We'll also put to use the fact that monad is a kind of functor ie. it can be mapped over (like a list or a map). So we'll add another operation to monad interface, called `fmap` that will give us ability to `map` over monadic values. 
+Many types you've probably used thousands of times can be treated as monads. For instance, a famous example of a `Monad` is `List` with `return` creating one element `List` and `bind` being Scala's `flatMap`. More involved examples include Slick's `Query` where `return` is a `Query#apply` and `bind` chains queries together (again, `flatMap`).
+We'll also put to use the fact that monad is a kind of functor i.e. it can be mapped over (like a list or a map). So we'll add another operation to monad interface, called `fmap` that will give us ability to `map` over monadic values. 
 Putting this together, we'll be representing monads as members of the following typeclass:
 
 TODO link to GitHub
@@ -383,7 +385,7 @@ trait Monad[M[_]] {
 }
 ```
 
-Because we'll be using `bind`  quite a lot let's make it a symbolic operator. I've chosen `>>=` to adhere to a Haskell tradition.
+Because we'll be using `bind` quite a lot let's make it a symbolic operator. I've chosen `>>=` to adhere to a Haskell tradition.
 
 ```scala
 final class MonadOps[M[_], A](val self: M[A])(implicit val monad: Monad[M]) {
@@ -398,8 +400,8 @@ object Monad extends MonadInstances {
 ##### Is Either a monad?
 
 Well, no it is not. But we won't let that stop us :-)
-First of all, monad is of kind `* -> *` while `Either`'s kind is `* -> * -> *` (that's fancy way of saying that `Monad` type constructor takes one type parameter while Either takes two). Then, you cannot compose Either without knowing whether it is `Right` or `Left`. Sometimes people say that `Either` lacks _bias_. Eg. had it been _right biased_ it would have been composable just like `Option` is by sticking to the `RightProjection` and bailing out on `LeftProjection`. 
-But we can easily form it into `Monad` ourselves. We just have to use one of the most loathed Scala features called _type lambdas_ to curry `Either` type constructor into `* -> *`. Later on I'm going to show how to make syntax easier on eyes but for now let's stick to standard ways:
+First of all, monad is of kind `* -> *` while `Either`'s kind is `* -> * -> *` (that's fancy way of saying that `Monad` type constructor takes one type parameter while Either takes two). Then, you cannot compose Either without knowing whether it is `Right` or `Left`. Sometimes people say that `Either` lacks _bias_ e.g. had it been _right biased_ it would have been composable just like `Option` is by sticking to the `RightProjection` and bailing out on `LeftProjection`. 
+But we can easily form it into `Monad` ourselves. We just have to use one of the most loathed Scala features called _type lambdas_ to curry `Either` type constructor into `* -> *`. Later on I'm going to show how to make syntax easier on the eyes but for now let's stick to standard ways:
 
 TODO link to github
 ```scala
@@ -414,7 +416,7 @@ trait MonadInstances {
 }
 ```
 
-In this code we fixed _bias_ and type kind in one go. (Sorry for the greek letters, I have some weakness to them :-) ). In case you didn't come across _type lambdas_ syntax before,  ```{ type λ[β] = Either[L, β] })#λ``` means: produce a new (anonymous) type with one hole but equivalent to `Either[L, β]` where L has been fixed. We'll be using type lambdas quite a lot  throughout this post, so please make sure that you understand this strange syntax. Implementation-wise we bind and map only with right projection thus giving `Either` right bias we so much needed.
+In this code we fixed _bias_ and type kind in one go. (Sorry for the Greek letters, I have some weakness for them :-) ). In case you didn't come across _type lambdas_ syntax before,  ```{ type λ[β] = Either[L, β] })#λ``` means: produce a new (anonymous) type with one hole but equivalent to `Either[L, β]` where L has been fixed. We'll be using type lambdas quite a lot throughout this series, so please make sure that you understand this strange syntax. Implementation-wise we bind and map only with right projection thus giving `Either` right bias we so much needed.
 
 ### Implement Kleisli and Kleisli arrow
 
@@ -450,8 +452,8 @@ object Kleisli extends KleisliInstances {
 }
 ```
 
-I once again apologize for overusing symbolic operators eg. `☆` to construct Kleisli functions (it used to be like this in Scalaz and I really like the symbol). 
-To get back an ordinary function from `Kleisli` without much hassle I added an implicit conversion from `Kleisli` to function type.
+Once again I wish to apologize for overusing symbolic operators eg. `☆` to construct Kleisli functions (it used to be like this in Scalaz and I really like the symbol). 
+To get back an ordinary function from `Kleisli` without much hassle I have added an implicit conversion from `Kleisli` to function type.
 The most important building block of Kleisli composition is this piece of code 
 ```☆((a: A) => this(a) >>= k.run)```. It gives a recipe of monadic composition: get a monad instance and use this monad's `bind` with a function that takes value out of monad and produces new monad. `Monad` takes care of plumbing. If you look closer that's exactly what we missed when we tried to use `Either` with arrows - now instead of implementing it by hand and cluttering our code we extracted this boilerplate into monads and arrows. What is left to be done is to implement `Arrow` made with `Kleisli`s. That's easy enough:
 
@@ -486,7 +488,8 @@ trait KleisliInstances {
 }
 
 ```
-Let's explain a few details. Once again we needed to use _type lambdas_ to trick Scala into thinking that `Kleisli` is a right type parameter to `Arrow` trait. We abstracted out monad leaving only arrow's input and output. All the methods rely on `point` to create a new monad instance and `bind` to push a value out of a monad into another one. Thus, you can't have Kleisli arrow without Monad, these two need to go together. To implement `compose` we just used `andThen` syntax from `Kleisli`.  We also have to tell the compiler how to convert our new arrow to `ArrowOps` to use convenient syntax:
+
+Let's explain a few details. Once again we needed to use _type lambdas_ to trick Scala into thinking that `Kleisli` is a right type parameter to `Arrow` trait. We abstracted out monad leaving only arrow's input and output. All the methods rely on `point` to create a new monad instance and `bind` to push a value out of a monad into another one. Thus, you can't have Kleisli arrow without Monad, these two need to go together. To implement `compose` we just used `andThen` syntax from `Kleisli`. We also have to tell the compiler how to convert our new arrow to `ArrowOps` to use convenient syntax:
 
 ```scala
   implicit def ToArrowOpsFromKleisliLike[G[_], F[G[_], _, _], A, B](v: F[G, A, B])(implicit arr: Arrow[({ type λ[α, β] = F[G, α, β] })#λ]) =
@@ -502,7 +505,7 @@ Let's go back to the drawing board. The flow can be much simplified because we w
 
 ![](http://virtuslab.com/wp-content/uploads/2015/10/kleisli_railway.png) 
 
-Red lines represent 'error handling track'. Their presence is caused by how we implemented `bind` in the `Either` monad ie. binding is _right biased_. When `Left` value is encountered, it breaks the flow. Bold blue lines represent _Kleisli composition_, they combine _monadic values_ together by unpacking them and feeding the next computation. One problem you might have noticed is the copying function represented by the dotted rectangle. It is not monadic and as such cannot participate in the normal flow. 
+Red lines represent 'error handling track'. Their presence is caused by how we implemented `bind` in the `Either` monad i.e. binding is _right biased_. When `Left` value is encountered, it breaks the flow. Bold blue lines represent _Kleisli composition_, they combine _monadic values_ together by unpacking them and feeding the next computation. One problem you might have noticed is the copying function represented by the dotted rectangle. It is not monadic and as such cannot participate in the normal flow. 
 
 #####Integrating non-monadic functions
 
@@ -527,7 +530,7 @@ Back to the code. Now, our business logic can handle errors and normal flow with
 
 We can cross out another requirement: **exceptions are gone**.
 On the other hand we came across some difficulties. First of all, passing the environment had been quite a hassle. Environment represented additional data that logic needed to operate on, and it didn't adhere to our monadic model. That forced us to rewrite the code a bit, leveraging the fact that what we've got after all is functions, and functions can be partially applied and curried. That's how we were able to completely eliminate `env` parameter from the equation. 
-Second, Scala will not understand the equivalence between `Either[A, B]` and `Either[Error, B]` unless it is explicitly stated as a type alias and asserted  *everywhere* to the compiler that we can mix these two. 
+Second, Scala will not understand the equivalence between `Either[A, B]` and `Either[Error, B]` unless it is explicitly stated as a type alias and asserted *everywhere* to the compiler that we can mix these two. 
 
 >no type parameters for method ☆: (f: A => M[B])org.virtuslab.blog.kleisli.Kleisli[M,A,B] exist so that it can be applied to arguments (org.virtuslab.blog.kleisli.ProductionLot => Either[org.virtuslab.blog.kleisli.Error,org.virtuslab.blog.kleisli.ProductionLot])
 >[error]  --- because ---
@@ -537,7 +540,7 @@ Second, Scala will not understand the equivalence between `Either[A, B]` and `Ei
 >[error]         ☆(verify(_, env)) >>>
 
 
-I will show you how to get rid of this useless type alias along with crap like 
+I will show you how to get rid of this useless type alias along with line-noise like 
 ```scala 
 val verifyProductionLotNotDoneF: (ProductionLot) => E[ProductionLot] = verifyProductionLotNotDone
 ``` 
@@ -546,4 +549,4 @@ in part two.
 ###Summary
 
 In this part we've been able to achieve quite a lot. Starting from uncomposable, imperative code with side effects, we've slowly paved our way to a proper functional
-code with error handling. It's as if we've built ourselves a little language to help us express various aspects of control flow normally implemented in imperative manner, without compromising on composability . In the next part we'll extend this example by implementing more requirements that you'd often find in coding business logic eg. logging (side-effects). I'll also explain various ways to make the code more readable by eliminating ugly looking _type lambdas_ and superfluous type tricks. Further down the road we'll look at the _env param_ once again and devise a way to handle it more cleanly, thus giving birth to arrow transformers. Stay tuned.
+code with error handling. It's as if we've built ourselves a little language to help us express various aspects of control flow normally implemented in imperative manner, without compromising on composability. In the next part we'll extend this example by implementing more requirements that you'd often find in coding business logic eg. logging (side-effects). I'll also explain various ways to make the code more readable by eliminating ugly looking _type lambdas_ and superfluous type tricks. Further down the road we'll look at the _env param_ once again and devise a way to handle it more cleanly, thus giving birth to arrow transformers. Stay tuned.
