@@ -255,10 +255,10 @@ TODO: link to GitHub
 ```scala
   private def productionLotArrow[Env](verify: (ProductionLot, Env) => Unit, copy: (ProductionLot, Env) => ProductionLot): (Long, Env) => Long =
     Function.untupled(
-      (productionLotsRepository.findExistingById _ *** identity[Env]) >>>
-        (verify.tupled &&&
-          (copy.tupled >>> productionLotsRepository.save)
-        ) >>> (_._2)
+      (productionLotsRepository.findExistingById _ *** identity[Env])
+        >>> (verify.tupled
+          &&& (copy.tupled >>> productionLotsRepository.save))
+          >>> (_._2)
     )
 ```
 
@@ -306,14 +306,15 @@ Starting production seems to be a little harder because of multiple arguments in
 It is much easier to add new functionality now. Because the business logic is abstracted out to a flow, the only place that needs to be changed is the flow itself. Let's review our **goal: production lot cannot be modified if its status has been set to done**. It's trivial to introduce it now, we have already seen it in the previous diagram.
 
 ```scala
-  private def productionLotArrow[Env](verify: (ProductionLot, Env) => Unit, copy: (ProductionLot, Env) => ProductionLot): (Long, Env) => Long = {
+  private def productionLotArrow[Env](verify: (ProductionLot, Env) => Unit,
+                                      copy: (ProductionLot, Env) => ProductionLot): (Long, Env) => Long = {
     val verifyProductionLotNotDoneF: ((ProductionLot, Env)) => Unit = { case (pl, _) => verifyProductionLotNotDone(pl) }
-    
+
     Function.untupled(
-      (productionLotsRepository.findExistingById _ *** identity[Env]) >>>
-        ((verify.tupled &&& verifyProductionLotNotDoneF) &&&
-          (copy.tupled >>> productionLotsRepository.save)
-        ) >>> (_._2)
+      (productionLotsRepository.findExistingById _ *** identity[Env])
+        >>> ((verify.tupled &&& verifyProductionLotNotDoneF)
+          &&& (copy.tupled >>> productionLotsRepository.save))
+          >>> (_._2)
     )
   }
 
@@ -432,31 +433,29 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) {
 
   def apply(a: A) = run(a)
 
-  def >=>[C](k: Kleisli[M, B, C])(implicit m: Monad[M]): Kleisli[M, A, C] = ☆((a: A) => this(a) >>= k.run)
+  def >=>[C](k: Kleisli[M, B, C])(implicit m: Monad[M]): Kleisli[M, A, C] = Kleisli((a: A) => this(a) >>= k.run)
   def andThen[C](k: Kleisli[M, B, C])(implicit m: Monad[M]): Kleisli[M, A, C] = this >=> k
 
-  def >==>[C](k: B => M[C])(implicit m: Monad[M]): Kleisli[M, A, C] = this >=> ☆(k)
+  def >==>[C](k: B => M[C])(implicit m: Monad[M]): Kleisli[M, A, C] = this >=> Kleisli(k)
   def andThenK[C](k: B => M[C])(implicit m: Monad[M]): Kleisli[M, A, C] = this >==> k
 
   def <=<[C](k: Kleisli[M, C, A])(implicit m: Monad[M]): Kleisli[M, C, B] = k >=> this
   def compose[C](k: Kleisli[M, C, A])(implicit m: Monad[M]): Kleisli[M, C, B] = k >=> this
 
-  def <==<[C](k: C => M[A])(implicit m: Monad[M]): Kleisli[M, C, B] = ☆(k) >=> this
+  def <==<[C](k: C => M[A])(implicit m: Monad[M]): Kleisli[M, C, B] = Kleisli(k) >=> this
   def composeK[C](k: C => M[A])(implicit m: Monad[M]): Kleisli[M, C, B] = this <==< k
 
-  def map[C](f: B ⇒ C)(implicit m: Monad[M]): Kleisli[M, A, C] = ☆((a: A) => m.fmap(this(a))(f))
+  def map[C](f: B ⇒ C)(implicit m: Monad[M]): Kleisli[M, A, C] = Kleisli((a: A) => m.fmap(this(a))(f))
 }
 
 object Kleisli extends KleisliInstances {
-  def ☆[M[_], A, B](f: A => M[B]): Kleisli[M, A, B] = Kleisli(f)
   implicit def kleisliFn[M[_], A, B](k: Kleisli[M, A, B]): (A) ⇒ M[B] = k.run
 }
 ```
 
-Once again I wish to apologize for overusing symbolic operators eg. `☆` to construct Kleisli functions (it used to be like this in Scalaz and I really like the symbol). 
 To get back an ordinary function from `Kleisli` without much hassle I have added an implicit conversion from `Kleisli` to function type.
 The most important building block of Kleisli composition is this piece of code 
-```☆((a: A) => this(a) >>= k.run)```. It gives a recipe of monadic composition: get a monad instance and use this monad's `bind` with a function that takes value out of monad and produces new monad. `Monad` takes care of plumbing. If you look closer that's exactly what we missed when we tried to use `Either` with arrows - now instead of implementing it by hand and cluttering our code we extracted this boilerplate into monads and arrows. What is left to be done is to implement `Arrow` made with `Kleisli`s. That's easy enough:
+```Kleisli((a: A) => this(a) >>= k.run)```. It gives a recipe of monadic composition: get a monad instance and use this monad's `bind` with a function that takes value out of monad and produces new monad. `Monad` takes care of plumbing. If you look closer that's exactly what we missed when we tried to use `Either` with arrows - now instead of implementing it by hand and cluttering our code we extracted this boilerplate into monads and arrows. What is left to be done is to implement `Arrow` made with `Kleisli`s. That's easy enough:
 
 TODO: link to GitHub
 ```scala
@@ -468,15 +467,15 @@ trait KleisliInstances {
 
     implicit def M: Monad[M]
 
-    override def id[A]: Kleisli[M, A, A] = ☆(a => M.point(a))
+    override def id[A]: Kleisli[M, A, A] = Kleisli(a => M.point(a))
 
-    override def arr[A, B](f: (A) => B): Kleisli[M, A, B] = ☆(a => M.point(f(a)))
+    override def arr[A, B](f: (A) => B): Kleisli[M, A, B] = Kleisli(a => M.point(f(a)))
 
-    override def first[A, B, C](f: Kleisli[M, A, B]): Kleisli[M, (A, C), (B, C)] = ☆ {
+    override def first[A, B, C](f: Kleisli[M, A, B]): Kleisli[M, (A, C), (B, C)] = Kleisli {
       case (a, c) => f(a) >>= ((b: B) => M.point((b, c)))
     }
 
-    override def second[A, B, C](f: Kleisli[M, A, B]): Kleisli[M, (C, A), (C, B)] = ☆ {
+    override def second[A, B, C](f: Kleisli[M, A, B]): Kleisli[M, (C, A), (C, B)] = Kleisli {
       case (c, a) => f(a) >>= ((b: B) => M.point((c, b)))
     }
 
@@ -517,15 +516,15 @@ Back to the code. Now, our business logic can handle errors and normal flow with
 ```scala
   type E[R] = Either[Error, R]
 
-  private def productionLotArrow[Env](verify: (ProductionLot, Env) => E[ProductionLot], copy: (ProductionLot, Env) => ProductionLot): Env => Long => E[Long] = {
+  private def productionLotArrow[Env](verify: (ProductionLot, Env) => E[ProductionLot],
+                                      copy: (ProductionLot, Env) => ProductionLot): Env => Long => E[Long] = {
     val verifyProductionLotNotDoneF: (ProductionLot) => E[ProductionLot] = verifyProductionLotNotDone
 
     (env: Env) => (
-      ☆[E, Long, ProductionLot](productionLotsRepository.findExistingById) >>>
-      ☆(verify(_, env)) >>>
-      ☆(verifyProductionLotNotDoneF)
-    ).map(copy(_, env)) >==>
-      productionLotsRepository.save _
+      Kleisli[E, Long, ProductionLot]{ productionLotsRepository.findExistingById }
+      >>> Kleisli { verify(_, env) }
+      >>> Kleisli { verifyProductionLotNotDoneF }
+    ).map(copy(_, env)) >==> productionLotsRepository.save _
   }
 ```
 
