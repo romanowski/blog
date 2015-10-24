@@ -1,7 +1,7 @@
 # Arrows, Monads and Kleisli - part I
 
 During Scala Days Amsterdam I came across a concept of [arrow](https://www.parleys.com/tutorial/functional-programming-arrows). It was called a *general interface to computation* and it looked like a technique that could bridge code that is imperative in nature with proper functional programming. Later on I read about [Railway Oriented Programming](http://fsharpforfunandprofit.com/rop/) and found it really neat. I was compelled to reinvent the wheel and check all this in practice. I dug up some old business logic Scala code, that could really be Java code with slightly different keywords, and tried to refactor it using all I'd learned about arrows. BTW, you can find code used in this blog post on Github TODO: link here. In this post I'll work with this code from the ground up and try to demonstrate curious things you can do with arrows. You can go through the examples by following commits in the GitHub repo. 
-Because no one in their sane mind likes to read "War and Peace"-sized posts, I decided to break it up into parts. In the first part I'll explain arrows and Kleisli arrows, trying to show how they can help to express business logic in terms of data flow. In the next parts I'll get into more complicated examples, try to overcome various Scala type-system deficiencies and, finally, introduce arrow transformers.
+Because no one in their sane mind likes to read "War and Peace"-sized posts, I decided to break it up into parts. In the first part I'll explain arrows and Kleisli arrows, trying to show how they can help to express business logic in terms of data flow. In the next parts I'll get into more complicated examples and, finally, introduce arrow transformers.
 
 ##### What's an arrow?
 In simple words arrow is a generalization of function i.e. it is an abstraction of things that behave like functions. [Wikipedia](https://en.wikipedia.org/wiki/Arrow_%28computer_science%29) says:
@@ -530,23 +530,56 @@ Back to the code. Now, our business logic can handle errors and normal flow with
 
 We can cross out another requirement: **exceptions are gone**.
 On the other hand we came across some difficulties. First of all, passing the environment had been quite a hassle. Environment represented additional data that logic needed to operate on, and it didn't adhere to our monadic model. That forced us to rewrite the code a bit, leveraging the fact that what we've got after all is functions, and functions can be partially applied and curried. That's how we were able to completely eliminate `env` parameter from the equation. 
-Second, Scala will not understand the equivalence between `Either[A, B]` and `Either[Error, B]` unless it is explicitly stated as a type alias and asserted *everywhere* to the compiler that we can mix these two. 
+Second, you need type alias to use functions returning `Either` as `Kleisli`
 
->no type parameters for method ☆: (f: A => M[B])org.virtuslab.blog.kleisli.Kleisli[M,A,B] exist so that it can be applied to arguments (org.virtuslab.blog.kleisli.ProductionLot => Either[org.virtuslab.blog.kleisli.Error,org.virtuslab.blog.kleisli.ProductionLot])
+>no type parameters for method apply: (run: A => M[B])org.virtuslab.blog.kleisli.Kleisli[M,A,B] exist so that it can be applied to arguments (org.virtuslab.blog.kleisli.ProductionLot => Either[org.virtuslab.blog.kleisli.Error,org.virtuslab.blog.kleisli.ProductionLot])
 >[error]  --- because ---
 >[error] argument expression's type is not compatible with formal parameter type;
 >[error]  found   : org.virtuslab.blog.kleisli.ProductionLot => Either[org.virtuslab.blog.kleisli.Error,org.virtuslab.blog.kleisli.ProductionLot]
 >[error]  required: ?A => ?M[?B]
->[error]         ☆(verify(_, env)) >>>
+>[error]         Kleisli { verify(_, env) } >>>
 
+You may be tempted to employ _type lambdas_ to get rid of alias e.g.
+```scala
+Kleisli[({ type E[R] = Either[Error, R] })#E, Long, ProductionLot] { productionLotsRepository.findExistingById }
+```
+but, aside readability woes, it is path to nowhere because of one of the most famous Scala compiler bugs: [SI-2712](https://issues.scala-lang.org/browse/SI-2712). Compiler complains that: 
+>value >>> is not a member of org.virtuslab.blog.kleisli.Kleisli[[R]scala.util.Either[org.virtuslab.blog.kleisli.Error,R],Long,org.virtuslab.blog.kleisli.ProductionLot]
 
-I will show you how to get rid of this useless type alias along with line-noise like 
-```scala 
-val verifyProductionLotNotDoneF: (ProductionLot) => E[ProductionLot] = verifyProductionLotNotDone
-``` 
-in part two.
+which is because of:
+
+>ToArrowOpsFromKleisliLike is not a valid implicit value for (=> org.virtuslab.blog.kleisli.Kleisli[[R]scala.util.Either[org.virtuslab.blog.kleisli.Error,R],Long,org.virtuslab.blog.kleisli.ProductionLot]) => ?{def >>>: ?} because:
+>[info] no type parameters for method ToArrowOpsFromKleisliLike: (v: F[G,A,B])(implicit arr: org.virtuslab.blog.kleisli.Arrow[[β, γ]F[G,β,γ]])org.virtuslab.blog.kleisli.ArrowOps[[β, γ]F[G,β,γ],A,B] exist so that it can be applied to arguments (org.virtuslab.blog.kleisli.Kleisli[[R]scala.util.Either[org.virtuslab.blog.kleisli.Error,R],Long,org.virtuslab.blog.kleisli.ProductionLot])
+>[info]  --- because ---
+>[info] argument expression's type is not compatible with formal parameter type;
+>[info]  found   : org.virtuslab.blog.kleisli.Kleisli[[R]scala.util.Either[org.virtuslab.blog.kleisli.Error,R],Long,org.virtuslab.blog.kleisli.ProductionLot]
+>[info]  required: ?F[?G, ?A, ?B]
+
+You might utter a cry of disbelief when you see that. After all, it is quite obvious that the following unification makes formal and actual types fit together: `{F[_, _, _] / Kleisli, G[_] / [R]scala.util.Either[org.virtuslab.blog.kleisli.Error,R], A / Long, B/ ProductionLot }`. Well, your intuition is right, but compiler cannot perform partial polymorphic type inference. Quoting Paul Philips:
+>Type lambdas are cool and all, but not a single line of the compiler was ever written with them in mind. They're just not going to work right: the relevant code is not robust.
+
+If you think you can outsmart it introducing exact implicit conversion, compiler will retaliate with not finding implicit arrow instance needed for the conversion.
+Instead of tilting with windmills it's better to refactor it slightly to guide type inference:
+
+///TODO link to GitHub
+```scala
+  private def productionLotArrow[Env](verify: (ProductionLot, Env) => Either[Error, ProductionLot],
+                                      copy: (ProductionLot, Env) => ProductionLot): Env => Long => Either[Error, Long] = {
+    type Track[T] = Either[Error, T]
+    def track[A, B](f: A => Track[B]) = Kleisli[Track, A, B](f)
+
+    val getFromDb = track { productionLotsRepository.findExistingById }
+    val validate = (env: Env) => track { verify(_: ProductionLot, env) } >>> track { verifyProductionLotNotDone }
+    val save = track { productionLotsRepository.save }
+
+    (env: Env) => (
+      getFromDb
+      >>> validate(env)
+    ).map(copy(_, env)) >>> save
+  }
+```
 
 ###Summary
 
 In this part we've been able to achieve quite a lot. Starting from uncomposable, imperative code with side effects, we've slowly paved our way to a proper functional
-code with error handling. It's as if we've built ourselves a little language to help us express various aspects of control flow normally implemented in imperative manner, without compromising on composability. In the next part we'll extend this example by implementing more requirements that you'd often find in coding business logic eg. logging (side-effects). I'll also explain various ways to make the code more readable by eliminating ugly looking _type lambdas_ and superfluous type tricks. Further down the road we'll look at the _env param_ once again and devise a way to handle it more cleanly, thus giving birth to arrow transformers. Stay tuned.
+code with error handling. It's as if we've built ourselves a little language to help us express various aspects of control flow normally implemented in imperative manner, without compromising on composability. In the next part we'll extend this example by implementing more requirements that you'd often find in coding business logic eg. logging (side-effects). I'll also eliminate ugly looking _type lambdas_. Further down the road we'll look at the _env_ param once again and devise a way to handle it more cleanly, thus giving birth to arrow transformers. Stay tuned.
