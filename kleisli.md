@@ -1,6 +1,6 @@
 # Arrows, Monads and Kleisli - part I
 
-During Scala Days Amsterdam I came across a concept of [arrow](https://www.parleys.com/tutorial/functional-programming-arrows). It was called a *general interface to computation* and it looked like a technique that could bridge code that is imperative in nature with proper functional programming. Later on I read about [Railway Oriented Programming](http://fsharpforfunandprofit.com/rop/) and found it really neat. I was compelled to reinvent the wheel and check all this in practice. I dug up some old business logic Scala code, that could really be Java code with slightly different keywords, and tried to refactor it using all I'd learned about arrows. BTW, you can find code used in this blog post on Github TODO: link here. In this post I'll work with this code from the ground up and try to demonstrate curious things you can do with arrows. You can go through the examples by following commits in the GitHub repo. 
+During Scala Days Amsterdam I came across a concept of [arrow](https://www.parleys.com/tutorial/functional-programming-arrows). It was called a *general interface to computation* and it looked like a technique that could bridge code that is imperative in nature with proper functional programming. Later on I read about [Railway Oriented Programming](http://fsharpforfunandprofit.com/rop/) and found it really neat. I was compelled to reinvent the wheel and check all this in practice. I dug up some old business logic Scala code, that could really be Java code with slightly different keywords, and tried to refactor it using all I'd learned about arrows. BTW, you can find code used in this blog post on [Github](https://github.com/VirtusLab/kleisli-examples). In this post I'll work with this code from the ground up and try to demonstrate curious things you can do with arrows. You can go through the examples by following commits in the GitHub repo. 
 Because no one in their sane mind likes to read "War and Peace"-sized posts, I decided to break it up into parts. In the first part I'll explain arrows and Kleisli arrows, trying to show how they can help to express business logic in terms of data flow. In the next parts I'll get into more complicated examples and, finally, introduce arrow transformers.
 
 ##### What's an arrow?
@@ -15,8 +15,7 @@ You can treat arrow as a function type that gives you more combinators to work w
 ### Let's get the party started
 Let's imagine we have legacy code pulled out of production tracking system. In this system things that are being tracked are modeled by a domain object called `ProductionLot` (simplified):
 
-TODO: link to github
-
+[Code](https://github.com/VirtusLab/kleisli-examples/tree/39da715cddad25415f7a455a8c702c0fe4f11ac8/src/main/scala/org/virtuslab/blog/kleisli)
 ```scala
 case class ProductionLot(id: Option[Long],
                          status: ProductionLotStatus.Value,
@@ -41,7 +40,7 @@ class ProductionLotsRepository {
 
 Business logic governing operations on production lots lies in, as you can imagine, `ProductionLotsService`. Let's say you can perform three operations in this system. You can start production of a production lot, revoke production lot (change its current status and clear other properties) and reassign production lot to a different worker. Obviously these operations need to perform some kind of validations (eg. you cannot reassign production lot to the same worker it already has), interact with db etc.
 
-TODO: link to GitHub
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/39da715cddad25415f7a455a8c702c0fe4f11ac8/src/main/scala/org/virtuslab/blog/kleisli/ProductionLotsService.scala)
 ```scala
 class ProductionLotsService(productionLotsRepository: ProductionLotsRepository) {
   def startProductionOf(productionLotId: Long, productionStartDate: Date, workerId: Long): Unit = {
@@ -103,7 +102,7 @@ As you can see this code is littered with problems. First of all, it communicate
 
 As you probably noticed, all the methods follow the same pattern. Get something from db, validate the change, modify the entity and update db. This observation makes it appealing to try to rewrite it in function composition style. Of course, methods returning unit are not very composition-friendly, so a few adjustments have to be made, but you can write it arguably cleaner in the following way:
 
-TODO link to GitHub
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/3a56b4ad7695d3123466308aaf884b47b94116ee/src/main/scala/org/virtuslab/blog/kleisli/ProductionLotsService.scala)
 ```scala
   def startProductionOf(productionLotId: Long, productionStartDate: Date, workerId: Long): Unit = {
     val verify: ProductionLot => ProductionLot = { productionLot =>
@@ -175,7 +174,7 @@ I find it really helpful to visualize arrow combinators:
 
 Looking closely at the definitions we are able to coin arrow interface in form of a trait. 
 
-TODO: link to GitHub
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/d54291947a52dcf4563e61ce7d7cf4f47b23dcf7/src/main/scala/org/virtuslab/blog/kleisli/Arrow.scala)
 ```scala
 trait Arrow[=>:[_, _]] {
   def id[A]: A =>: A
@@ -222,7 +221,7 @@ Mapping between functions and arrows is straightforward:
 - `compose` is function composition
 - `first` is a function that operates on a 2-tuple argument, mapping first part and leaving 2nd unaltered
 
-TODO: link to GitHub
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/d54291947a52dcf4563e61ce7d7cf4f47b23dcf7/src/main/scala/org/virtuslab/blog/kleisli/ArrowInstances.scala)
 ```scala
 trait ArrowInstances {
   // function is arrow
@@ -250,8 +249,7 @@ Now that we have extended functions with arrow combinators, we can use them in o
 
 Looks good. Translating this flow back to code gives us very generic function that can be used to implement all the buisness logic we have:
 
-TODO: link to GitHub
-
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/045af5dabd26883ec2695c87f1159350a95e0c12/src/main/scala/org/virtuslab/blog/kleisli/ProductionLotsService.scala)
 ```scala
   private def productionLotArrow[Env](verify: (ProductionLot, Env) => Unit, copy: (ProductionLot, Env) => ProductionLot): (Long, Env) => Long =
     Function.untupled(
@@ -330,7 +328,7 @@ Although we have improved internals of existing code a bit there is still much b
 Representing various outcomes of a computation with Either forms a powerful pattern. It makes error handling the part of normal control flow and allows for a fully type-safe and functional code in the presence of errors. 
 Let's revisit all the places in our code base where exception may be thrown and rewrite them using Either. We'll represent error cases as subtypes of the new Error class which encode what went wrong in the type and carry some additional information.
 
-TODO link to GitHub
+[Code](https://github.com/VirtusLab/kleisli-examples/tree/8023f02cfb49ac5d9f464ff89e63e585618d5be5/src/main/scala/org/virtuslab/blog/kleisli)
 ```scala
 sealed abstract class Error(val message: String)
 
@@ -377,8 +375,7 @@ Many types you've probably used thousands of times can be treated as monads. For
 We'll also put to use the fact that monad is a kind of functor i.e. it can be mapped over (like a list or a map). So we'll add another operation to monad interface, called `fmap` that will give us ability to `map` over monadic values. 
 Putting this together, we'll be representing monads as members of the following typeclass:
 
-TODO link to GitHub
-
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/a3786602f3c1a345d3a0c32cc09a18ceca266627/src/main/scala/org/virtuslab/blog/kleisli/Monad.scala)
 ```scala
 trait Monad[M[_]] {
   def point[A](a: => A): M[A]
@@ -405,7 +402,7 @@ Well, no it is not. But we won't let that stop us :-)
 First of all, monad is of kind `* -> *` while `Either`'s kind is `* -> * -> *` (that's fancy way of saying that `Monad` type constructor takes one type parameter while Either takes two). Then, you cannot compose Either without knowing whether it is `Right` or `Left`. Sometimes people say that `Either` lacks _bias_ e.g. had it been _right biased_ it would have been composable just like `Option` is by sticking to the `RightProjection` and bailing out on `LeftProjection`. 
 But we can easily form it into `Monad` ourselves. We just have to use one of the most loathed Scala features called _type lambdas_ to curry `Either` type constructor into `* -> *`. Later on I'm going to show how to make syntax easier on the eyes but for now let's stick to standard ways:
 
-TODO link to github
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/a3786602f3c1a345d3a0c32cc09a18ceca266627/src/main/scala/org/virtuslab/blog/kleisli/MonadInstances.scala)
 ```scala
 trait MonadInstances {
   implicit def eitherMonad[L] = new Monad[({ type λ[β] = Either[L, β] })#λ] {
@@ -424,8 +421,7 @@ In this code we fixed _bias_ and type kind in one go. (Sorry for the Greek lette
 
 `Kleisli` type as such is just a wrapper over functions of type `A => M[B]`. Still, we can put a few operations into it, provided that `M[_]` is an instance of monad eg. `andThen` and `compose` variants that we'll reuse for arrow composition and `map` function that we'll use later.
 
-TODO: link to GitHub
-
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/a3786602f3c1a345d3a0c32cc09a18ceca266627/src/main/scala/org/virtuslab/blog/kleisli/Kleisli.scala)
 ```scala
 final case class Kleisli[M[_], A, B](run: A => M[B]) {
   import Monad._
@@ -457,7 +453,7 @@ To get back an ordinary function from `Kleisli` without much hassle I have added
 The most important building block of Kleisli composition is this piece of code 
 ```Kleisli((a: A) => this(a) >>= k.run)```. It gives a recipe of monadic composition: get a monad instance and use this monad's `bind` with a function that takes value out of monad and produces new monad. `Monad` takes care of plumbing. If you look closer that's exactly what we missed when we tried to use `Either` with arrows - now instead of implementing it by hand and cluttering our code we extracted this boilerplate into monads and arrows. What is left to be done is to implement `Arrow` made with `Kleisli`s. That's easy enough:
 
-TODO: link to GitHub
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/a3786602f3c1a345d3a0c32cc09a18ceca266627/src/main/scala/org/virtuslab/blog/kleisli/KleisliInstances.scala)
 ```scala
 trait KleisliInstances {
   //kleisli (a => m b) is arrow
@@ -513,6 +509,7 @@ When composing monadic functions we obtain a monad instance `M[B]` from `M[A]` b
 
 Back to the code. Now, our business logic can handle errors and normal flow with ease:
 
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/60c48bba3edcbd1a2d145c557f4bd140a64c3534/src/main/scala/org/virtuslab/blog/kleisli/ProductionLotsService.scala)
 ```scala
   type E[R] = Either[Error, R]
 
@@ -561,7 +558,7 @@ You might utter a cry of disbelief when you see that. After all, it is quite obv
 If you think you can outsmart it introducing exact implicit conversion, compiler will retaliate with not finding implicit arrow instance needed for the conversion.
 Instead of tilting with windmills it's better to refactor it slightly to guide type inference:
 
-///TODO link to GitHub
+[Code](https://github.com/VirtusLab/kleisli-examples/blob/13ce32e4b5ba80ca2988187e683b78e1faef395a/src/main/scala/org/virtuslab/blog/kleisli/ProductionLotsService.scala)
 ```scala
   private def productionLotArrow[Env](verify: (ProductionLot, Env) => Either[Error, ProductionLot],
                                       copy: (ProductionLot, Env) => ProductionLot): Env => Long => Either[Error, Long] = {
