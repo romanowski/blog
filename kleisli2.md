@@ -2,6 +2,7 @@
 
 In [part I](http://virtuslab.com/blog/arrows-monads-and-kleisli-part-i) I showed how Kleisli arrows could be used to implement domain modeling. Arrows serve as a foundation for a 'DSL' in which one can implement typical scenarios that arise in business-logic code: decoupling flow control from domain code, dealing with errors etc. Much to the spirit of [Railway Oriented Programming](http://fsharpforfunandprofit.com/posts/recipe-part2), but implemented in more generic terms. 
 In this part I'll fill in the missing parts of this 'framework' - taking care of side-effects, conditional execution and mixing different monads in a single 'pipeline'.
+There is one more part planned where I'll introduce kind-projector and arrow transformers.
 Let's pick up where we left:
 
 ```scala
@@ -53,12 +54,12 @@ It turns out that choice of execution path can be easily expressed using arrows.
 
 ![](http://virtuslab.com/wp-content/uploads/2015/11/kleisli_choice.png) 
 
-Here we have two possible paths of execution (marked red and blue) based on data hold in an `Either` instance passed as input. 
-`left(f)` feeds `Left` input through its argument arrow, leaving the other part unchanged. `right(f)`  mirrors `left`. Thinking in terms of Scala library, these operators are maps on, respectively, `Left` and `Right` projections. 
+Here we have two possible paths of execution (marked red and blue) based on data held in an `Either` instance passed as input. 
+`left(f)` feeds `Left` input through its argument arrow, leaving the other part unchanged. `right(f)` mirrors `left`. Thinking in terms of Scala library, these operators are maps on, respectively, `Left` and `Right` projections. 
 `Multiplex(+++)` simply combines both `left` and `right` into a single operation. It applies `f` if input is a `Left` or `g` if it is a `Right`
 `Fanin(|||)` is `+++` which merges the output. Think Scala's `Either.fold`.
 
-Implementation is straightforward
+Implementation is straightforward:
 
 [Code](https://github.com/VirtusLab/kleisli-examples/blob/2041b8db7d3557895cfa1fb7d0f2e40cd9e821bd/src/main/scala/org/virtuslab/blog/kleisli/Choice.scala)
 ```scala
@@ -78,7 +79,7 @@ trait Choice[=>:[_, _]] { self: Arrow[=>:] =>
 }
 ```
 
-... and additional symbolic ops
+... and additional symbolic ops:
 
 ```scala
 final class ChoiceOps[=>:[_, _], A, B](val self: A =>: B)(implicit val choice: Choice[=>:]) {
@@ -166,7 +167,7 @@ I promised to show how to face the situation when functions that you want to bui
 ```scala
 def save(productionLot: ProductionLot): Try[Long] = ???
 ```
-Obviously we also need to state that `Try` is actually a monad (there is some controversy about that, but for the sake of this post let's slide over that)
+Obviously we also need to state that `Try` is actually a monad (there is some controversy about that, but for the sake of this post let's slide over that):
 
 [Code](https://github.com/VirtusLab/kleisli-examples/blob/f2f02fc45b2dace17e40b0bb2bbafdd1086310d3/src/main/scala/org/virtuslab/blog/kleisli/KleisliInstances.scala)
 ```scala
@@ -189,7 +190,7 @@ def map[C](f: B ⇒ C)(implicit m: Monad[M]): Kleisli[M, A, C] = Kleisli((a: A) 
 ```
 `map` composes `B => C` with `A => M[B]` to get `A => M[C]`. In other words it turns a function of type `B => C`  into a `M[B] => M[C]` function.
 This is possible with all functors, and, as you probably remember from part one, every monad is a functor.
-Now, we can pretend that function `A => Try[B]` is kind of _non-monadic_ from the perspective of `Either` monad and write this as follows
+Now, we can pretend that function `A => Try[B]` is kind of _non-monadic_ from the perspective of `Either` monad and write this as follows:
 
 ```scala
 //...
@@ -204,7 +205,7 @@ Now, we can pretend that function `A => Try[B]` is kind of _non-monadic_ from th
         .run -| (logError ||| logSuccess)
 ```
 
-Or, we can name this operation explicitly by adding `liftM` method to `Kleisli` class
+Or, we can name this operation explicitly by adding `liftM` method to `Kleisli` class:
 
 [Code](https://github.com/VirtusLab/kleisli-examples/blob/f2f02fc45b2dace17e40b0bb2bbafdd1086310d3/src/main/scala/org/virtuslab/blog/kleisli/Kleisli.scala)
 ```scala
@@ -213,7 +214,7 @@ final case class Kleisli[M[_], A, B](run: A => M[B]) {
   def liftM[N[_]](implicit n: Monad[N]): Kleisli[N, A, M[B]] = Kleisli((a: A) => n.point(this(a)))
 }
 ```
-which turns arrow definition into
+which turns arrow definition into:
 
 ```scala
     (env: Env) =>
@@ -302,4 +303,4 @@ One can say that `save`'s just got back on track :-)
 
 ###The end
 
-All right, that's all folks. Stay tuned for the last part of series where we'll introduce kind projector and arrow transformers. Hope you enjoyed it so far.
+All right, that's all folks. Stay tuned for the last part of series. Hope you enjoyed it so far.
