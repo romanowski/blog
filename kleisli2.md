@@ -29,7 +29,7 @@ Clearly we're gonna need to reroute main flow around dead-end. _Action_ does not
 
 ![](http://virtuslab.com/wp-content/uploads/2015/11/kleisli_tee.png)
 
-If you read the first part, it'd probably ring a bell - _tee_ looks very much alike arrow _split_ operator.
+If you read the first part, it probably rings a bell. Do you remember arrow _split_ operator? _Tee_ looks very much alike, doesn't it?
 That's right - in arrow language: `tee(f) = (f &&& action) >>> _._1`.
 Let's add this little function to `Arrow` trait:
 
@@ -167,7 +167,7 @@ I promised to show how to face the situation when functions that you want to bui
 ```scala
 def save(productionLot: ProductionLot): Try[Long] = ???
 ```
-Obviously we also need to state that `Try` is actually a monad (there is some controversy about that, but for the sake of this post let's slide over that):
+Obviously we also need to state that `Try` is actually a monad (there is some controversy about that, but I won't delve into this matter):
 
 [Code](https://github.com/VirtusLab/kleisli-examples/blob/f2f02fc45b2dace17e40b0bb2bbafdd1086310d3/src/main/scala/org/virtuslab/blog/kleisli/KleisliInstances.scala)
 ```scala
@@ -180,7 +180,7 @@ Obviously we also need to state that `Try` is actually a monad (there is some co
   }
 ```
 
-There is no one-size-fits-all answer I believe, but I'll show you two possible ways of solving this awkwardness.
+There is no one-size-fits-all answer, I believe, but I'll show you two possible ways of solving this awkwardness.
 
 ##### Lift
 
@@ -277,7 +277,7 @@ object Kleisli extends KleisliInstances {
 }
 ```
 
-The fancy `~>` type used in `transform` behaves exactly like a generalized map that can transform one monad into another, irrespective of type of a value the monad carries inside. BTW what a fine example of higher-order polymorphism.
+The fancy `~>` type used in `transform` behaves exactly like a generalized map that can transform one monad into another, irrespective of type of a value the monad carries inside. BTW, what a fine example of higher-order polymorphism.
 And `transform` is very simple to use:
 
 [Code](https://github.com/VirtusLab/kleisli-examples/blob/c53c66cfb091e11611dcf46e0b775f395264b537/src/main/scala/org/virtuslab/blog/kleisli/ProductionLotsService.scala)
