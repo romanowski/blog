@@ -9,7 +9,6 @@ At library designer level it is a completely different story though.
 At VirtusLab we constantly have to debug internals of third party libraries and the Scala itself. We often find ourselves profiling scalac, debugging Sbt, or looking into bizarre Slick issues. If you ever had to do that you know that it can be painful experience. Huge amount of esoteric language features used together is not making it any easier. And heavy usage of implicits is almost constant pattern.
 If you are not really experienced Scala programmer you can be lost.
 
-
 Luckily we are not left alone with that problem. Main Scala IDEs like [ScalaIDE](http://scala-ide.org/docs/current-user-doc/features/typingviewing/implicit-highlighting/index.html) or [IntelliJ](http://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Implicit+Conversions) are able to list currently used implicits and we can do the same in REPL as well.
 
 Let's go through a basic example with Ordering type class to check how things work together and what to do in case you are stuck. First, let's create simple class wrapper around Int value and make array of its elements:
