@@ -3,6 +3,13 @@ Debugging implicits
 
 I was recently asked what are my favorite and least favorite Scala features. Probably few options would be matching here, but I decided to give one answer for both questions: implicits. Why? Implicits are very simple and yet very powerful concept but with great power comes great responsibility. They can be used for implicit parameters, implicit conversions, view bonds and context bounds (type classes) letting us solve couple of different problems with one language feature. But at the same time we must be aware in what context we are using them and - which is much harder - which implicits are available in the current context.
 
+As long as you are application programmer (see: [Scala levels: beginner to expert, application programmer to library designer](http://www.scala-lang.org/old/node/8610)) this is not a big concern. Most of the Scala libraries are designed cleverly enough to hide complexity from the user.
+At library designer level it is a completely different story though.
+
+At VirtusLab we constantly have to debug internals of third party libraries and the Scala itself. We often find ourselves profiling scalac, debugging Sbt, or looking into bizarre Slick issues. If you ever had to do that you know that it can be painful experience. Huge amount of esoteric language features used together is not making it any easier. And heavy usage of implicits is almost constant pattern.
+If you are not really experienced Scala programmer you can be lost.
+
+
 Luckily we are not left alone with that problem. Main Scala IDEs like [ScalaIDE](http://scala-ide.org/docs/current-user-doc/features/typingviewing/implicit-highlighting/index.html) or [IntelliJ](http://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Implicit+Conversions) are able to list currently used implicits and we can do the same in REPL as well.
 
 Let's go through a basic example with Ordering type class to check how things work together and what to do in case you are stuck. First, let's create simple class wrapper around Int value and make array of its elements:
