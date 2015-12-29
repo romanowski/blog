@@ -2,13 +2,13 @@
 
 ## Problem:
 
-Our client is providing sophisticated tool to manage projects that is used by some of the CAC-40 (Euronext Paris) listed companies. This software stack was going through a lot of transformations and rapid development to cover new functionality, however using relational database as a persistance layer started to be more and more an obstacle to follow new business needs that should be expressed and adopted in this software. More and more data processing was done by application code, in memory, where database was "downgraded" to a simple key-value storage.
+Our client is providing sophisticated tool to manage projects that is used by some of the CAC-40 (Euronext Paris) listed companies. This software stack was going through a lot of transformations and rapid development to cover new functionality, however using relational database as a persistence layer started to be more and more an obstacle to follow new business needs that should be expressed and adopted in this software. More and more data processing was done by application code, in memory, where database was "downgraded" to a simple key-value storage.
 
-[ simple storage ] -- [ join/split connected data | connected data | queries enginee | json/REST ] -- [ UI / Angular ]
+[ simple storage ] -- [ join/split connected data | connected data | queries engine | json/REST ] -- [ UI / Angular ]
 
 While this is a usual path when scaling up - taking more processing from database and distributing it on application nodes - it also brings a lot of ugliness - like no visibility of business facts in your storage, a need to use higher lever tools to "just see" your data, no simple way to query, validate or change them. Any ad-hoc business analytics needs writing additional application features (no simple database queries) -- all these drives up application complexity even further and we end up not only with more expensive development of new functionalities but also with higher bug-fixing/quality/maintenance costs.
 
-There was also a new requirement -- go immutable with all changes to allow queries and comparisons in time. That was something the existing model was not prepared for -- while fixing it to have "undo" values was an easy step, fixing it for "undo relations" would mean a snapshot of the whole structure every time such changed occured. That way in few weeks we would have to manage hundreds of DB instances, available for quering. A complete no-go without hiring a new DevOps team (and another budget for it).
+There was also a new requirement -- go immutable with all changes to allow queries and comparisons in time. That was something the existing model was not prepared for -- while fixing it to have "undo" values was an easy step, fixing it for "undo relations" would mean a snapshot of the whole structure every time such changed occurred. That way in few weeks we would have to manage hundreds of DB instances, available for querying. A complete no-go without hiring a new DevOps team (and another budget for it).
 
 ## Graph DB evaluation and prototyping
 
@@ -18,7 +18,7 @@ First phase was to evaluate how such data can be expressed in a more usable form
 
 The important thing about modelling your graph data in Neo4j is about getting the model right. You are not going to get it for the first time, as what you really need you will see when you translate existing queries into Cypher or db-api calls and execute them, getting some benchmark numbers. A small ETL in Ruby/Neography helped a lot with quick changes on how the data model should be transformed from SQL and stored in Neo. That way many customisations already existing in SQL data didn't need to go to new Scala logic as one-offs for different customers.
 
-When we got a usefull model, we could start analysing it with Cypher. Neo4j comes with a nice graphical data browser/visualisation tool, however you can still use a command-line shell when you need it.
+When we got a useful model, we could start analysing it with Cypher. Neo4j comes with a nice graphical data browser/visualisation tool, however you can still use a command-line shell when you need it.
 
 [TODO: screenshot of some data vis]
 
