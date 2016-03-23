@@ -1,52 +1,85 @@
-# Lambda-like architecture with Neo4j
+# Lambda-like architecture on highly connected data with Neo4j
 
 ## Problem:
 
-Our client is providing sophisticated tool to manage projects that is used by some of the CAC-40 (Euronext Paris) listed companies. This software stack was going through a lot of transformations and rapid development to cover new functionality, however using relational database as a persistence layer started to be more and more an obstacle to follow new business needs that should be expressed and adopted in this software. More and more data processing was done by application code, in memory, where database was "downgraded" to a simple key-value storage.
+Imagine you have to manage hundreds of different projects, that could have hundreds of different actions. These projects can be grouped at many levels, some of them can be grouped into different "monitoring groups" - and of course, you have some people assigned to them to execute them (corporate speak for "you have to do it"), some others are assigned to monitor them. You have "cost centers", progress and performance measures and all this related management things on top... and it has to be quite generic.
 
+This is roughly the kind of sophisticated tool used by some of the large CAC-40 (Euronext Paris) listed companies that we were working on. This software stack was going through a lot of transformations and rapid development to cover new functionality and get more generic architecture.
+
+### Asynchronous graphs with actors
+
+To get speed and flexibility, it was rewritten to Scala and Akka with relational database as a persistence layer and more and more data processing was done in application code.
+
+The data flow was looking like this:
 ```
-[ simple storage ] -- [ join/split connected data | data | graph-query engine | json/REST ] -- [ UI / Angular ]
-```
-
-While this is a usual path when scaling up - taking more processing from database and distributing it on application nodes - it also brings a lot of ugliness - like no visibility of business facts in your storage, a need to use higher lever tools to "just see" your data, no simple way to query, validate or change them. Any ad-hoc business analytics needs additional application feature (no simple database queries unless you decide to create - oh, a new module to allow queries API?) -- all these drives up application complexity even further and we end up not only with more expensive development of new functionalities but also with higher bug-fixing/quality/maintenance costs.
-
-There was also a new requirement -- go immutable with all changes to allow queries and comparisons in time. That was something the existing model was not prepared for -- while fixing it to have "undo" values was an easy step, fixing it for "undo relations" would mean a snapshot of the whole structure every time such changed occurred. That way in few weeks we would have to manage hundreds of DB instances, available for querying. A complete no-go without hiring a new DevOps team (and another budget for it).
-
-## Graph DB evaluation and prototyping
-
-First phase was to evaluate how such data can be expressed in a more usable form. At that time there were 2-3 graph database options available on the market (OrientDB and perhaps Titan), but after quick check and with a very constrained budget, we decided to go prototyping with Neo4j. It was the most mature solution for this type of data and size, with good coverage in language drivers/api/doc, active community and ok licensing. The Cypher query language used by Neo4j is similar to SQL but covers functionality for connected data points. All that was a promise for a project with acceptable risks levels that will bring new, expected features. We'd already had some previous experience with Neo4j, so it was easy to start with.
-
-### Model: How do you query your data?
-
-```
-[ simple storage ] >>---(change and try)-->> [ new graph model ] <<-- validate with Cypher queries
+[ simple storage ] -- [ merge/split <=> data <=> graph-query engine <=> json/REST API ] -- [ UI / Angular ]
 ```
 
-The important thing about modelling your graph data in Neo4j is about getting the model right. You are not going to get it for the first time, as what you really need you will see when you translate existing queries into Cypher or db-api calls and execute them, getting some benchmark numbers. A small ETL in Ruby/Neography helped a lot with quick changes on how the data model should be transformed from SQL and stored in Neo. That way some per-client customisations existing in old SQL model could be also cleaned and translated to more flexible graph model, not polluting new Scala logic.
+While this is a usual path when scaling up - downgrade database to simple key-value storage and take processing to better distributed application nodes - it also moves a lot of complexity to business layer, in the same time taking off visibility of business facts from storage. While Scala is almost a perfect language for that kind of middle tier, it doesn't solve complexity problems related to doing everything in code, "by hands".
 
-Neo4j comes a command-line and a nice graphical data browser/visualisation tool, so you can quickly visualise what you have:
+Now you can't just "browse", "query" or "check" your data stored like in a typical SQL or NoSQL document db. If you need any ad-hoc business analytics/inteligence, it has to be done in application layer. All these needs just drives up application complexity even further and we end up not only with more expensive development of new functionalities but also with higher bug-fixing/quality/maintenance costs.
+
+There was also another wish from the client -- go immutable with all changes to allow queries and comparisons in time. That was something the existing model was not prepared for. While improving it to have "undo" values was an easy step, adding "undo relations" would mean a snapshot of the whole structure every time such changed occurred. That way in few weeks we would have to manage hundreds of DB "snapshots", available for querying. A complete no-go without hiring a new DevOps team, not to mention potential fragality of such approach.
+
+## Perhaps we should try graph database?
+
+First phase was to evaluate how such data can be expressed in a more usable form. At that time there were 2-3 viable graph database options available on the market (OrientDB and perhaps Titan), but after some checking and knowing we have quite constrained budget in terms of possible project risk/failure, we decided to go prototyping only with Neo4j. It was the most mature solution for this type of data and size, with good coverage in language drivers/api and doc, active community and ok licensing (the same like e.g. MongoDB). The Cypher query language used by Neo4j is similar to SQL but covers functionality for connected data points. All that was a promise for a project with acceptable risks levels that can bring new, expected features. We'd already had some previous experience with Neo4j, so it was easy to start with.
+
+### How to model your data - how do you query your data?
+
+The important thing about modelling your graph data in Neo4j is about getting the model right. You are not going to get it for the first time, as what you really need in terms of database structure, you will see when you translate existing queries into Cypher (Neo graph SQL) or db-api calls and execute them, getting some benchmark numbers. This is more like a quick prototype-check-fix cycle
+
+```
+[ key-val storage ] --> converter --> [ graph model ] <--> validate with Cypher graph queries
+```
+
+A small ETL in Ruby/Neography helped a lot with quick changes on how the data model should be transformed from SQL and stored in Neo4j. That way also some per-client customisations existing in old SQL model could be cleaned and translated to more flexible, general graph model, not polluting new Scala middle-tier logic.
+
+Neo4j comes with a handy command-line and a nice web data browser, so you can easily visualise what you have:
 
 ![Neo4j query visualisation](neo4j_graphs2.png)
 
-In Cypher - the graph query language used in Neo4j, we describe what to select as a group of nodes and how these nodes are connected. Its crucial part of syntax actually looks simple and quite natural:
+### Cypher - graph query language
+
+In general, graphs have "nodes" or "vertexes", connected by relations or edges. A single node could be like a small table in SQL world.
+
+Cypher - the [graph query language used in Neo4j http://neo4j.com/developer/cypher-query-language/], can describe what you want to select in terms on nodes and connections between them. The basic syntax is actually quite simple and natural.
+
+Imagine you have two nodes
 
 ```
-(node1)-[:connection]->(other_node)
+(project)-[:connection]->(action)
 ```
 
 and could be written in a way similar to SQL:
 
 ```
-MATCH (node1)-[:connection]->(other_node)
-WHERE node1.name="Foo" and other_node.name="BAR"
-RETURN node1, other_node
+MATCH (project)-[:connection]->(action)
+WHERE project.name="Innovation" and action.name="Wireless-enabled fridge"
+RETURN project, action
 ```
 
-It can grow to express what we want to do with returned paths, sum values or aggregate returned nodes - http://neo4j.com/docs/stable/cypher-query-lang.html
+There may be actually someone working on it:
 
-## Lambda-like architecture - time-machine with immutable data
+```
+(project)-[:connection]->(action)<-[:working]-(person)
+```
 
-The business data represents graph of connections and advancement of executed projects for this moment in time. There was already a functionality to keep previous changes of "node" values, but nothing like this for connections. New design was to cover immutability of the whole data structure - e.g. someone would like to know how the state of the overall project was looking like exactly 24 hours or 3 months ago, who changed what or to do some aggregation over periods of time to see how the progress has been going on. The answer was to separate mutable changes from immutable "cores", time-stamping all the changes - where the change could be not only in a typical data row but also in a connection.
+This action can belong in the same time to some "wireless R&and;D" cost centre, while project is managed by some PM:
+
+```
+(person {title: "PM"})-[:managing]->(project)-[:connection]->(action)<-[:working]-(person)
+                    (cost_centre {name: "Wireless"})-[:has]->(action)
+```
+This is written in two lines, but when visualised, we would have this single "action" in the centre of our picture.
+
+Now we may want to add even more data - our PM just handed this project over from someone else, there could be more actions in her project and she wants to e.g. see progress or perhaps how much time every working person spent on her projects last week. And this is just the beginning.
+
+## Let's complicate it: lambda-like architecture for time-machine with immutable data
+
+Our graph can represent graph of connections and advancement of executed projects for the current moment of time, "now". We already had a functionality to keep previous changes of "node" values, like an action.name, but we didn't have anything to keep track when our action goes to another project. We needed an architecture to cover immutability of the whole data structure. We may ask "how our projects and assignements were looking like 3 months ago", or "who moved that project and did we save more than 10% of global R&and;D costs"? Or perhaps we just want so do some aggregation over periods of time to see how the progress has been going on. 
+
+The answer was to separate mutable changes from immutable "cores", time-stamping all the changes - where the change of data is both a change in node properties and connections between them.
 
 This idea could be expressed in a model like this:
 
@@ -54,9 +87,9 @@ This idea could be expressed in a model like this:
 
 P1 and P2 are "immutable cores of data entities". P1 got 4 changes, so they are stored as a sequence of states S1-S4. P2 got two changes S1-S2. At some point of time the properties of relation r1 connecting P1 and P2 have changed, creating another relation r2.
 
-Of course, there are more answers to how to store time-dependent data - it is worth to do (your own research|https://www.google.com/search?q=neo4j+with+time+dependent+data), there are many similar examples.
+Of course, there are more answers to how to store time-dependent data - it is worth to do (your own research|https://www.google.com/search?q=neo4j+with+time+dependent+data), there are many other examples.
 
-## Indexing and constraints
+### Modelling back: Indexing and constraints
 
 Some of the questions that we needed to consider while modeling new structures were - how are we going to use this data, query it, how database can help us to keep it healthy, unique and quick to find? Neo4j has indexes that work on node data - they take node label and node property and can be constrained as a pair of unique values - similar to what we know from SQL databases:
 
@@ -68,7 +101,7 @@ There are also "legacy" indexes, configured in
 ```
 conf/neo4j.properties
 ```
-(or with the Java API), a bit lower-level and closer to background Lucene engine, which give us possibility to index practically any property in a graph, even do a full-text indexing. Just by using a proper indexing scheme on our data we could reduce query times 10-fold. With newer versions of Neo4j, there also comes profiler and query-explain syntax to see how possibly a query can be optimised and/or indexing improved.
+(or with the Java API), a bit lower-level and closer to background Lucene engine, that give us possibility to index practically any property in a graph, even do a full-text indexing. Just by using a proper indexing scheme on our data we could reduce query times 10-fold. With newer versions of Neo4j, there also comes profiler and query-explain syntax to see how possibly a query can be optimised and/or indexing improved.
 
 ## Delivering new Scala API
 
