@@ -1,10 +1,10 @@
-# Lambda-like architecture on highly connected data with Neo4j
+# Immutable graphs with Neo4j
 
 ## Problem:
 
-Imagine you have to manage hundreds of different projects, that could have hundreds of different actions. These projects can be grouped at many levels, some of them can be grouped into different "monitoring groups" - and of course, you have some people assigned to them to execute them (corporate speak for "you have to do it"), some others are assigned to monitor them. You have "cost centers", progress and performance measures and all this related management things on top... and it has to be quite generic.
+Imagine you have to manage hundreds of different projects, that could have several different actions or building blocks. These projects can be grouped into "monitoring groups" - and you have some people assigned to execute them, some others are assigned to monitor them. You have "cost centers", progress and performance measures and all this related management things on top. It has to be generic enough to cover different types of businesses, yet all of them need to manage projects.
 
-This is roughly the kind of sophisticated tool used by some of the large CAC-40 (Euronext Paris) listed companies that we were working on. This software stack was going through a lot of transformations and rapid development to cover new functionality and get more generic architecture.
+This is the kind of sophisticated tool used by some of the large CAC-40 (Euronext Paris) listed companies that we were working on. This software stack was going through a lot of transformations and rapid development to cover new functionality and get more generic architecture.
 
 ### Asynchronous graphs with actors
 
@@ -15,15 +15,15 @@ The data flow was looking like this:
 [ simple storage ] -- [ merge/split <=> data <=> graph-query engine <=> json/REST API ] -- [ UI / Angular ]
 ```
 
-While this is a usual path when scaling up - downgrade database to simple key-value storage and take processing to better distributed application nodes - it also moves a lot of complexity to business layer, in the same time taking off visibility of business facts from storage. While Scala is almost a perfect language for that kind of middle tier, it doesn't solve complexity problems related to doing everything in code, "by hands".
+While this is a usual path when scaling out - downgrade database to simple key-value storage and take data processing to better distributed application nodes - it also moves a lot of complexity to business layer, in the same time taking off visibility and consistency checks of business data from storage. While Scala is almost a perfect language for middle tiers, it doesn't solve complexity problems related to doing everything in "our" code, "by hands".
 
-Now you can't just "browse", "query" or "check" your data stored like in a typical SQL or NoSQL document db. If you need any ad-hoc business analytics/inteligence, it has to be done in application layer. All these needs just drives up application complexity even further and we end up not only with more expensive development of new functionalities but also with higher bug-fixing/quality/maintenance costs.
+Having such a simple storage means you can't just browse, query or "check" that data like in a typical SQL or NoSQL document database. If you need any ad-hoc business analytics/inteligence, it has to be done in application layer. There is a reason why business loves SQL and SQL-related technologies and it is the simplicity of exploring existing data. Here all new queries have to be coded as APIs, in the same time it just increases bug-fixing and maintenance costs.
 
-There was also another wish from the client -- go immutable with all changes to allow queries and comparisons in time. That was something the existing model was not prepared for. While improving it to have "undo" values was an easy step, adding "undo relations" would mean a snapshot of the whole structure every time such changed occurred. That way in few weeks we would have to manage hundreds of DB "snapshots", available for querying. A complete no-go without hiring a new DevOps team, not to mention potential fragality of such approach.
+There was also another wish from the client -- go immutable with all changes to allow queries and comparisons in time. That was something the existing model was not prepared for. While improving it to have "undo" values was an easy step, adding "undo relations" would mean a snapshot of the whole structure every time such change occurred. That way in few weeks we would have to manage hundreds of DB "snapshots", available for querying. A complete no-go without having a dedicated Dev/Ops team, even then handling several different databases wouldn't be easy and cost-effective.
 
 ## Perhaps we should try graph database?
 
-First phase was to evaluate how such data can be expressed in a more usable form. At that time there were 2-3 viable graph database options available on the market (OrientDB and perhaps Titan), but after some checking and knowing we have quite constrained budget in terms of possible project risk/failure, we decided to go prototyping only with Neo4j. It was the most mature solution for this type of data and size, with good coverage in language drivers/api and doc, active community and ok licensing (the same like e.g. MongoDB). The Cypher query language used by Neo4j is similar to SQL but covers functionality for connected data points. All that was a promise for a project with acceptable risks levels that can bring new, expected features. We'd already had some previous experience with Neo4j, so it was easy to start with.
+First phase was to evaluate how such data can be expressed in a more usable form. At that time there were 2-3 viable graph database options available on the market (OrientDB and perhaps Titan), but after some checking and knowing we have quite constrained budget in terms of possible project risk/failure, we decided to go prototyping only with Neo4j. It was the most mature solution for this type of data and size, with good coverage in language drivers/api and doc, active community and ok licensing (the same like e.g. MongoDB). The Cypher query language used by Neo4j is similar to SQL but covers functionality for connected data points. All that was a promise for a project with acceptable risks levels that can bring new, desired features. We already had some previous experience with Neo4j, so it was easy to start with.
 
 ### How to model your data - how do you query your data?
 
@@ -41,17 +41,17 @@ Neo4j comes with a handy command-line and a nice web data browser, so you can ea
 
 ### Cypher - graph query language
 
-In general, graphs have "nodes" or "vertexes", connected by relations or edges. A single node could be like a small table in SQL world.
+In general, graphs have "nodes" or "vertices", connected by relations or edges. A single node in Neo4j could be like a small table in SQL world, having its own fields with values.
 
 Cypher - the [graph query language used in Neo4j http://neo4j.com/developer/cypher-query-language/], can describe what you want to select in terms on nodes and connections between them. The basic syntax is actually quite simple and natural.
 
-Imagine you have two nodes
+Imagine you have two nodes, a project with some action to be done
 
 ```
 (project)-[:connection]->(action)
 ```
 
-and could be written in a way similar to SQL:
+To get it, we can write a query similar to SQL:
 
 ```
 MATCH (project)-[:connection]->(action)
@@ -71,13 +71,11 @@ This action can belong in the same time to some "wireless R&and;D" cost centre, 
 (person {title: "PM"})-[:managing]->(project)-[:connection]->(action)<-[:working]-(person)
                     (cost_centre {name: "Wireless"})-[:has]->(action)
 ```
-This is written in two lines, but when visualised, we would have this single "action" in the centre of our picture.
-
-Now we may want to add even more data - our PM just handed this project over from someone else, there could be more actions in her project and she wants to e.g. see progress or perhaps how much time every working person spent on her projects last week. And this is just the beginning.
+This is written in two lines, but when visualised, we would have this single "action" node in the centre of our picture.
 
 ## Let's complicate it: lambda-like architecture for time-machine with immutable data
 
-Our graph can represent graph of connections and advancement of executed projects for the current moment of time, "now". We already had a functionality to keep previous changes of "node" values, like an action.name, but we didn't have anything to keep track when our action goes to another project. We needed an architecture to cover immutability of the whole data structure. We may ask "how our projects and assignements were looking like 3 months ago", or "who moved that project and did we save more than 10% of global R&and;D costs"? Or perhaps we just want so do some aggregation over periods of time to see how the progress has been going on. 
+Our graph can represent graph of connections and advancement of executed projects for the current moment of time, "now". We already had a functionality to keep previous changes of node values, like an action.name, but we didn't have anything to keep track when our action moves to another project. We needed an architecture to cover immutability of the whole data structure. We may ask "how our projects and assignements were looking like 3 months ago", or "who moved that project and did we save more than 10% of global R&and;D costs"? Or perhaps we just want so do some aggregation over periods of time to see how the progress has been going on. 
 
 The answer was to separate mutable changes from immutable "cores", time-stamping all the changes - where the change of data is both a change in node properties and connections between them.
 
@@ -109,9 +107,7 @@ The software stack was split into separate parts, with UI written in Html5/JS/An
 
 While developing this stack the helpful part of Scala toolbox were type aliases (to better express already used compound structures), packing simple but specific data values into its own case classes and when the processing model was quickly changing - using implicit conversions between types to minimize impact of changes to the existing code in the first step and deliver new functionality without too much refactoring.
 
-Another story is about Scala standard collections, folds, options for optional/partial data. Also parts of Scalaz library were very helpful by providing simple operations for transforming and merging complex monoid-like data structures. 
-
-I hope to write another blog post just focusing on these techniques - while such Scalaz-monoid functionalities can be found in libraries in other languages too, implicit type conversions are not that common.
+Another story is about Scala standard collections, folds, options for optional/partial data. Also parts of Scalaz library were very helpful by providing simple operations for transforming and merging complex monoid-like data structures.
 
 The crucial part developed from the very beginning were integration tests written in BDD style, covering quickly growing complexity of the new engine and possible operations. To sum it up from higher perspective, another layer of functional tests were covering http API calls and JSON structures/transformations, with help of Scalatest.
 
@@ -119,16 +115,23 @@ The crucial part developed from the very beginning were integration tests writte
 
 The Scala-Neo4j space does not give too much room when picking up the best library, even if some parts of Neo4j are written in Scala. Using native Java connectivity feels like too much boilerplate. FaKod library was an interesting option with its own DSL but also forcing to learn "another version of Cypher" which could lead to a game "how I could possibly write such Cypher statement in my Cypher-like narrowed DSL", so well-known when using some SQL/ORM-like libraries. The suitable choice seemed to be AnormCypher, allowing to execute any kind of Cypher queries, but also requiring careful quoting and parsing of returned data. It is worth to mention constant awareness of Scala-Java conversions in collection types, as they can be sometimes quite tedious to spot when "leaking" to other parts of code with quite surprising error messages.
 
-AnormCypher actually has one processing drawback that led to problems with heap - all data read by REST client is transformed in-memory before being handed out to an application. For some queries, even when the whole database was around 15MB in size, the query response data could grow 10-fold with another 10-fold to process it. I hope to find some time to help fixing it, as it was quite annoying to see JVM breaking with 3-4 GBs memory pool, while processing so little in terms of data size.
+AnormCypher actually has one processing drawback that led to problems with heap - all data read by REST client is transformed in-memory to more table-like structures before being handed out to an application. That was very problematic when one node can have several relations, that way several "rows" were created for every single data point (think Cartesian join in SQL). For some queries, even when the whole database was around 15MB in size, the query response data could grow 10-fold with another 10-fold to process it. That led to annoying JVM crashes with 3-4 GBs memory pool, while processing so little in terms of data size.
 
-But processing such data is a game with many goals - there is not so much business value in perfectly valid and complex queries if the execution and processing time is way below expectations. Actually the solution for heap but also for speed problems was to go with hybrid data model by adding caching layer - some data is taken from Neo4j but some additional operations are optimised/filled up by using data from cache.
+Another problem was with latency of some queries. We have got perfectly valid complex queries, however their execution time was below client expectations. Both of these problems we solved going with hybrid data model -- adding cache layer for simple point-to-point connections - that way more complex "root" data is taken from Neo4j while additional information is quickly filled up from cache.
 
 ## Room for further improvements
 
-There are many places in data model and design that can be improved further, especially when it comes to gathering how the data will be used and where and how quickly it will be growing. Perhaps not all changes should have been kept - from time perspective, we are more sensitive about current than historical data, so old changes could have been partially flattened in time-periods with the other erased to keep our storage fit.
+There are many places in data model and design that can be improved further. Graph databases are quite different think, but share similar problems and challanges. 
+
+* How the data will be used and where and how quickly it will be growing? 
+* Do we care about all changes? From time perspective, we are more sensitive about current than historical data, so old changes could be partially flattened/"squashed" by time-periods to keep our storage fit.
 
 ## Overall experience with Neo4j
 
-Neo4j is a tool that is quick and easy to start with but complex in its analytical possibilities. It can drastically simplify business logic when dealing with more connected data, giving quick tools to "see" and "touch" it. It opens up new area to explore existing data, "a higher kind of abstraction", giving  a feeling similar to when someone compares flat files versus full SQL database with SQL queries - or when we put files modified by a team of people into VCS so we can easily manage and see all changes. It is simple to write Cypher queries to prototype and develop new reports, try some new analytical things, get fresh insights. There is a hidden complexity that can sporadically appear --  Neo4j approach to graph structure, graph indexing, queries with optional matches or differences between REST or write-your-own server extension. There are also some "grey" places like Neo4j simple backup that actually creates files that cannot be directly consumed by Neo4j import tool. On the other hand - by easier manipulation, navigation and visualisation, Neo4j adds new value to existing data.
+Neo4j is a tool that is easy to start with but complex in its analytical possibilities. It can drastically simplify business logic when dealing with more connected data, giving quick tools to "see" and "touch" it. It opens up new area to explore existing data, "a higher kind of abstraction", giving  a feeling similar to when someone compares operating on flat files versus full SQL database. 
 
-Perhaps it can simplify your project-of-connected-data too?
+It is simple to write Cypher queries to prototype and develop new reports, try some new analytical things and get fresh insights. There is a hidden complexity that can sporadically appear --  Neo4j approach to express graph structure and traversing, graph indexing, queries with optional matches or differences between using REST or write-your-own server extension. There were also some "grey" places like Neo4j simple backup that actually creates files that cannot be directly consumed by Neo4j import tool. On the other hand - by easier manipulation, navigation and visualisation, Neo4j adds new value to existing data.
+
+Neo4j is already used by several smaller and bigger companies. Recently it was also used as a tool for investigative journalism around "Panama Leaks".
+
+Perhaps it can help with your project-of-connected-data too?
