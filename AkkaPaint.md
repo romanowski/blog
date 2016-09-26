@@ -216,6 +216,6 @@ We have walked through the general idea, and practical examples of some extraord
 * painting images on *AkkaPaint* board, with the great help of [akka-stream](http://doc.akka.io/docs/akka/2.4.10/scala/stream/index.html) and [rapture.io](rapture.io) json library. 
 
 I am not able to describe everything in this blog post, as the text is already too long.
-All those features can be found here: [akkapaint](https.github.com/liosedhel/akkapaint). There are a lot of great ideas to be implemented (e.g. creating private boards, some compression and further performance optimizations, loading images through the browser, UI improvements...). All contributions are really welcome! 
+All those features can be found here: [akkapaint](https://github.com/liosedhel/akkapaint). There are a lot of great ideas to be implemented (e.g. creating private boards, some compression and further performance optimizations, loading images through the browser, UI improvements...). All contributions are really welcome! 
 
 Happy hAkking!
