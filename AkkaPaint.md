@@ -3,18 +3,18 @@
 
 Introduction
 -------------
-Once upon a time, there was an idea of [complete chaos](http://chaos.drawball.com/), where you could express and instantly share everything you care. However, the time of *Adobe Flash* is long gone, so the new idea was born: make the *chaos* great again! And that is how from chaos arose *AkkaPaint*.
+Once upon a time, there was an idea of a [complete chaos](http://chaos.drawball.com/), where you could express and instantly share anything you care about. However, the days of *Adobe Flash* are long gone, so the new idea was born: make the *chaos* great again! And this is how from chaos arose *AkkaPaint*.
 
 The idea was pretty straightforward - create a drawing space, which will be:
 * multiuser,
-* able to propagate changes to all user in real time,
-* and scalable.
+* able to propagate changes to all users in real time,
+* scalable.
 
 You may ask, where is the challenge? The answer is: make the implementation really small and simple.
 
 Drawing board representation - basics
 -------------
-Drawing board can be represented as a simple map between pixel coordinates and color representation of that pixel. It’s really naive approach, without any optimizations, but let’s find out how it works. Furthermore, every change on the drawing board can be represented as an event, which contains pixel sequence and new color applied for this pixels.
+Drawing board can be represented as a simple map between pixel coordinates and color representation of that pixel. It’s really naive approach, which doesn't include any optimizations, but it's working surprisingly well. Furthermore, every change on the drawing board can be represented as an event, which contains pixel sequence and a new color applied for this pixels.
 
 ![AkkaPaint pixels](akkapaint/AkkaPaint-blog_board.png)
 
@@ -23,18 +23,18 @@ case class Pixel(x: Int, y: Int)
 
 case class DrawEvent(
     pixels: Seq[Pixel],
-    color:   String
+    color:   Color
 )
 
 //Board state
 type Color = String
-var drawballBoard = Map.empty[Pixel, Color]
+var akkaPaintBoard = Map.empty[Pixel, Color]
 ```
 
 
 Drawing board as an actor
 -------------
-For me, the whole problem sounds like something perfect for the [Akka Toolkit](http://akka.io/). The painting board can be easily represented as an Actor. Internal actor state can contains the pixel to color map (`akkaPaintBoard: Map[Pixel, Color]`). As we want to preserve the actor state between application restart, we will use [Persistent Actor](http://doc.akka.io/docs/akka/current/scala/persistence.html) here. Every change to the board will be saved as an event. Sounds great!
+For me, the whole problem sounds like a perfect fit for the [Akka Toolkit](http://akka.io/). The painting board can be easily represented as an Actor. Internal actor state can contains a map where pixels are keys and colors are values (`akkaPaintBoard: Map[Pixel, Color]`). As we want to preserve the actor state between application restarts, we will use [Persistent Actor](http://doc.akka.io/docs/akka/current/scala/persistence.html) here. Every change to the board will be saved as an event. Sounds great!
 
 ```scala
 class AkkaPaintActorSimple() extends PersistentActor {
@@ -64,14 +64,16 @@ class AkkaPaintActorSimple() extends PersistentActor {
 }
 ```
 
-Scalable Draw Board
+Scalable drawing board
 -------------
-The draw board size can be really big, what imply a lot of pixels to process, a lot of changes to apply. Sadly, too much for one actor. So let's split whole sheet to the small squares - e.g. 100x100 px each. Such square can be represented by one actor, and will hold only the color of 10000 pixels. Ideally, we want them to scale also horizontally, as sometimes whole board can't fit into one machine memory, or we want to use computing power of other machines. And here comes [Akka Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html)! The [idea](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html#How_it_works) is simple: actors (here called entities) are formed into shards (shard is simply a group of actors), and each shard can be located on different machine. Above all this, there is exactly one coordinator, which knows the location of each shard and each entity. The shard ID and entity ID is extracted based on incoming data, with the use of two simple functions presented below (`extractShardId` and `extractEntityId`) . The `shardingPixels` method is responsible for splitting incoming stream of pixel color changes into smaller packages addressed for exactly one entity.
+The size of a drawing board can be enormous, what implies a lot of pixels to be processed and a lot of changes to be applied. Sadly, that's too much for one actor. So let's split the whole board into small squares 100x100 pixels each. Such square can be represented by one actor, and will hold the colors only of 10000 pixels. Ideally, we want to scale the problem horizontally, as sometimes whole board can't fit into one machine's memory, or we want to use computing power of more machines. And here comes [Akka Cluster Sharding](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html)! The [idea](http://doc.akka.io/docs/akka/current/scala/cluster-sharding.html#How_it_works) is simple: actors (here called entities) are forming shards (shard is simply a group of actors), and each of the shards can be located on a different machine. Furthermore, there is a concept of coordinator, which knows the location of each shard and each entity. The shard ID and entity ID are extracted from incoming data using two simple functions presented below (`extractShardId` and `extractEntityId`) . The `shardingPixels` method is responsible for splitting an incoming stream of pixel color changes into smaller packages addressed to exactly one entity.
 
 ```scala
+val entitySize = 100
+
 def shardingPixels(changes: Iterable[Pixel], color: String): Iterable[DrawEntity] = {
       changes.groupBy { pixel =>
-        (pixel.y / 100, pixel.x / 100)
+        (pixel.y / entitySize, pixel.x / entitySize)
       }.map {
         case ((shardId, entityId), pixels) =>
           DrawEntity(shardId, entityId, pixels, color)
@@ -89,11 +91,11 @@ private val extractShardId: ShardRegion.ExtractShardId = {
 }
 ```
 
-What is illustrated here:
+This solution is illustrated here:
 
 ![AkkaPaint shard and entities](akkapaint/AkkaPaint-blog-board-shard.png)
 
-Creating cluster and obtaining `ShardRegion` reference (`ShardRegion` is an local actor representing the entrance to the cluster) can look like this:
+Creating a cluster and obtaining the `ShardRegion` reference (`ShardRegion` is a local actor representing the entrance to the cluster) can look like this:
 
 ```scala
  def initializeClusterSharding(actorSystemConf: Config): ActorSystem = {
