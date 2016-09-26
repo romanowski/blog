@@ -116,23 +116,17 @@ Creating a cluster and obtaining the `ShardRegion` reference (`ShardRegion` is a
     ClusterSharding(actorSystem).shardRegion(regionName)
   }
 ```  
-We can send all messages to the `ShardRegion`, which knows (thanks to the Coordinator) how to route messages to the proper entity. Also worth to mention: if new machine joins the cluster, some of the shards will be moved to that machine (look at `least-shard-allocation-strategy` configuration). Resharding process is done in few steps:
+We can send all messages to the `ShardRegion`, which knows (thanks to the coordinator) how to route messages to the proper entity. Also it is worth to mention that if new machine joins the cluster, some of the shards will be moved to that machine (look at `least-shard-allocation-strategy` configuration). This process is called `resharding` and is performed in few steps:
 
-1. The shard that will be moved to another machine is chosen by coordinator.
-2. Coordinator inform `ShardRegion` to start buffering all messages that are incoming to this shard.
-3. All the actors inside the chosen shard are killed.
-4. Shard and actors are started on new machine (the state of the actor will be restored from the persisted previously in database events).
-5. All buffered data are send to the newly restored shard.
+1. The shard that will be moved to another machine is chosen by the coordinator.
+2. Coordinator informs `ShardRegion` to start buffering all messages that are incoming to this shard.
+3. All of the actors inside the chosen shard are killed.
+4. Shard and actors are started on a new machine (the state of the actor will be restored from the events that were previously persisted in a database).
+5. All buffered data is sent to the newly restored shard.
 
-Perceptive reader surely see here potential inconvenience - with a lot of incoming messages during resharding process, the buffer can be overflowed. Sadly, all you are able to do is resizing the buffer by setting `akka.cluster.sharding.buffer-size` configuration parameter.
+Perceptive reader will surely notice here a potential inconvenience - with a lot of incoming messages during the resharding process, the buffer can overflow. Sadly, all you can do is to resize the buffer by setting `akka.cluster.sharding.buffer-size` configuration parameter.
 
-The board size can be easily changed without any current data loss (for now by changing some hardcoded variables in the project). Shards and entities will be dynamically created at runtime in case of board resizing.  
-
-Horizontal scaling is possible on 3 different levels:
-
-1. Play! web application (serving static data, parsing json messages incoming through WebSocket, converting to json and pushing messages to the client browser)
-2. Akka Cluster Sharding (updating internal actor state (saving events and snapshots), sending changes to all registered clients) 
-3. Cassandra database (saving events and snapshots stream, serving events and snapshots during cluster restart and resharding process)
+The board size can be easily changed without any current data loss. Shards and entities will be dynamically created at runtime in case of board resizing.  
 
 ![Three different possible horizontal scaling levels](akkapaint/AkkaPaint-blog-scaling.png)
 
@@ -150,6 +144,8 @@ class ClientConnectionActor(
   width: Int
 ) extends Actor {
 
+  val entitySize = 100
+
   registerToAll(self).foreach(shardRegion ! _)
   var recentChanges = Map.empty[Pixel, String]
 
@@ -166,8 +162,8 @@ class ClientConnectionActor(
   
   def registerToAll(self: ActorRef): Iterable[ShardingRegister] = {
       for {
-        shardId <- 0 until (height / 100)
-        entityId <- 0 until (width / 100)
+        shardId <- 0 until (height / entitySize)
+        entityId <- 0 until (width / entitySize)
       } yield ShardingRegister(shardId, entityId, self)
     }
 }
@@ -180,7 +176,19 @@ def socket = WebSocket.accept[Draw, Changes](requestHeader => {
       ))
 })
 ```
-And know all we need is "just" a few lines of JavaScript, HTML and CSS and everything is up and running.
+And now all we need is "just" a few lines of JavaScript, HTML and CSS and everything is up and running.
+
+Total scalability of the *AkkaPaint*
+-------------
+
+The application consists of 3 main parts:
+
+1. Play! web application (serving static data, parsing json messages incoming via WebSocket, converting to json and pushing messages to the client browser)
+2. Akka Cluster Sharding (updating internal actor state (saving events and snapshots), sending changes to all registered clients) 
+3. Cassandra database (saving events and snapshots stream, serving events and snapshots during cluster restart and resharding process)
+
+Each of this parts can be easily scaled horizontally.
+
 
 Try it on your own!
 -------------
@@ -188,16 +196,16 @@ Try it on your own!
 * Install and run [Cassandra](http://cassandra.apache.org/) database
 * Clone the project: [akkapaint](https://github.com/liosedhel/akkapaint)
 * Type `sbt run`
-* Go to the browser address: [http://localhost:9000/demo](http://localhost:9000/demo) and express yourself drawing what you want! 
+* Go to the browser address: [http://localhost:9000/demo](http://localhost:9000/demo) and express yourself by drawing whatever you want to! 
 
-Or you can try it online here: [http://demo.akkapaint.org/](http://demo.akkapaint.org/). Maybe drop there your country flag?
+In case you don't want to download anything you can try it online here: [http://demo.akkapaint.org/](http://demo.akkapaint.org/). Maybe drop your country's flag there?
  
-Furthermore, you can borrow your computer resources :). If you want to join the cluster, find the `akkapaint-web.conf` file and apply the `if you want to join me` comments actions. Restart your application and voilà - in 10 seconds part of the shards should be moved to your machine (you should see some logging on your console).
+Furthermore, you can lend your computer resources. If you want to join the cluster, find the `akkapaint-web.conf` file and apply the `if you want to join me` comments actions. Restart your application and voilà - in 10 seconds part of the shards should be moved to your machine (you should see some logging on your console).
 
 Summary
 -------------
 
-We have walked through the general idea, and practical examples of some extraordinary *Akka* features (like persistent actors, clustering, sharding) that allowed us to build multiuser, scalable *AkkaPaint* with enabled real time changes. Current working implementation has only 288 LOC! *Akka* really shines here. There is a lot more things I've implemented, such as:
+We have walked through the general idea, and practical examples of some extraordinary *Akka* features (like persistent actors, clustering, sharding) which allowed us to build a multiuser, scalable *AkkaPaint* with possibility to get the updates in the real time. The current working implementation has only 288 LOC! *Akka* really shines here. There is a lot more things I've implemented, such as:
 
 * snapshoting
 * performance optimizations (e.g. messages serialized via [Protocol Buffer](https://developers.google.com/protocol-buffers/) 
@@ -207,7 +215,7 @@ We have walked through the general idea, and practical examples of some extraord
 * preparing some gatling tests
 * painting images on *AkkaPaint* board, with the great help of [akka-stream](http://doc.akka.io/docs/akka/2.4.10/scala/stream/index.html) and [rapture.io](rapture.io) json library. 
 
-I am not able to describe everything in this blog post, as already this text is way too long :)
-All this features and more you can find here: [akkapaint](https.github.com/liosedhel/akkapaint). There is a lot of great ideas possible to implement (e.g. creating private boards, some compression and further performance optimizations, loading images through the browser, UI improvements...). All contributions really welcome! 
+I am not able to describe everything in this blog post, as the text is already too long.
+All those features can be found here: [akkapaint](https.github.com/liosedhel/akkapaint). There are a lot of great ideas to be implemented (e.g. creating private boards, some compression and further performance optimizations, loading images through the browser, UI improvements...). All contributions are really welcome! 
 
 Happy hAkking!
