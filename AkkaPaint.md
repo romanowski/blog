@@ -71,7 +71,7 @@ The size of a drawing board can be enormous, what implies a lot of pixels to be 
 ```scala
 val entitySize = 100
 
-def shardingPixels(changes: Iterable[Pixel], color: String): Iterable[DrawEntity] = {
+def shardingPixels(changes: Iterable[Pixel], color: Color): Iterable[DrawEntity] = {
       changes.groupBy { pixel =>
         (pixel.y / entitySize, pixel.x / entitySize)
       }.map {
@@ -127,8 +127,6 @@ We can send all messages to the `ShardRegion`, which knows (thanks to the coordi
 Perceptive reader will surely notice here a potential inconvenience - with a lot of incoming messages during the resharding process, the buffer can overflow. Sadly, all you can do is to resize the buffer by setting `akka.cluster.sharding.buffer-size` configuration parameter.
 
 The board size can be easily changed without any current data loss. Shards and entities will be dynamically created at runtime in case of board resizing.  
-
-![Three different possible horizontal scaling levels](akkapaint/AkkaPaint-blog-scaling.png)
 
 Multiple users
 -------------
@@ -189,6 +187,7 @@ The application consists of 3 main parts:
 
 Each of this parts can be easily scaled horizontally.
 
+![Three different possible horizontal scaling levels](akkapaint/AkkaPaint-blog-scaling.png)
 
 Try it on your own!
 -------------
