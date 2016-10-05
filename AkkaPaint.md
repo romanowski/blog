@@ -3,7 +3,15 @@
 
 Introduction
 -------------
-Once upon a time, there was an idea of a [complete chaos](http://chaos.drawball.com/), where you could express and instantly share anything you care about. However, the days of *Adobe Flash* are long gone, so the new idea was born: make the *chaos* great again! And this is how from chaos arose *AkkaPaint*.
+
+<p>
+Once upon a time, there was an idea of a [complete chaos](http://chaos.drawball.com/), 
+where you could express and instantly share anything you care about. 
+However, the days of *Adobe Flash* are long gone,
+so the new idea was born:
+make the *chaos* great again! 
+And this is how from chaos arose [*AkkaPaint*](https://github.com/liosedhel/akkapaint).
+</p>
 
 The idea was pretty straightforward - create a drawing space, which will be:
 * multiuser,
@@ -126,7 +134,7 @@ We can send all messages to the `ShardRegion`, which knows (thanks to the coordi
 
 Perceptive reader will surely notice here a potential inconvenience - with a lot of incoming messages during the resharding process, the buffer can overflow. Sadly, all you can do is to resize the buffer by setting `akka.cluster.sharding.buffer-size` configuration parameter.
 
-The board size can be easily changed without any current data loss. Shards and entities will be dynamically created at runtime in case of board resizing.  
+A current state of the board persists even after changing the size of it in the code. Shards and entities will be dynamically created at runtime in case of board resizing.  
 
 Multiple users
 -------------
