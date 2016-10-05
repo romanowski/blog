@@ -4,14 +4,14 @@
 Introduction
 -------------
 
-<p>
-Once upon a time, there was an idea of a [complete chaos](http://chaos.drawball.com/), 
-where you could express and instantly share anything you care about. 
-However, the days of *Adobe Flash* are long gone,
-so the new idea was born:
-make the *chaos* great again! 
-And this is how from chaos arose [*AkkaPaint*](https://github.com/liosedhel/akkapaint).
-</p>
+
+*Once upon a time, there was an idea of a [complete **chaos**](http://chaos.drawball.com/),  
+where you could express and instantly share anything you care about.*  
+*However, the days of Adobe Flash are long gone,*  
+*so the new idea was born:*  
+*make the **chaos** great again!*   
+*And this is how from chaos arose [**AkkaPaint**](https://github.com/liosedhel/akkapaint)*   
+
 
 The idea was pretty straightforward - create a drawing space, which will be:
 * multiuser,
