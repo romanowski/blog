@@ -5,8 +5,8 @@ Introduction
 -------------
 
 
-*Once upon a time, there was an idea of a [complete chaos](http://chaos.drawball.com/),*  
-*where you could express and instantly share anything you care about.*  
+*Once upon a time, there was a [complete chaos](http://chaos.drawball.com/),*  
+*where you could draw and instantly share everything like a boss.*  
 *However, the days of Adobe Flash are long gone,*  
 *so the new idea was born:*  
 *make the chaos great again!*   
