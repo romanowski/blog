@@ -42,7 +42,7 @@ var akkaPaintBoard = Map.empty[Pixel, Color]
 
 Drawing board as an actor
 -------------
-For me, the whole problem sounds like a perfect fit for the [Akka Toolkit](http://akka.io/). The painting board can be easily represented as an Actor. Internal actor state can contains a map where pixels are keys and colors are values (`akkaPaintBoard: Map[Pixel, Color]`). As we want to preserve the actor state between application restarts, we will use [Persistent Actor](http://doc.akka.io/docs/akka/current/scala/persistence.html) here. Every change to the board will be saved as an event. Sounds great!
+For me,  [Akka Toolkit](http://akka.io/) seems to be a perfect fit for this problem. The painting board can be easily represented as an Actor. Internal actor state can contains a map where pixels are keys and colors are values (`akkaPaintBoard: Map[Pixel, Color]`). As we want to preserve the actor state between application restarts, we will use [Persistent Actor](http://doc.akka.io/docs/akka/current/scala/persistence.html) here. Every change to the board will be saved as an event. Sounds great!
 
 ```scala
 class AkkaPaintActorSimple() extends PersistentActor {
